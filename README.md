@@ -1,57 +1,45 @@
-# {{crew_name}} Crew
+# Meme Launch Manager
 
-Welcome to the {{crew_name}} Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+This project is an automatic meme coin generation project based on real-time trends in Korea using CrewAi.
 
-## Installation
+It consists of two main agent crews.
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+1. Trending Scraper: Scrapes the trends that are being discussed in Korea from all Korean trending services and determines the most discussed keywords by AI.
 
-First, if you haven't already, install uv:
+2. Meme Deployer: Taking the trending keywords determined by the Trending Scraper, it creates metadata for meme tokens and utilizes it to deploy meme tokens.
 
-```bash
-pip install uv
-```
+## How to run
 
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
-```
-
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/meme_launch_manager/config/agents.yaml` to define your agents
-- Modify `src/meme_launch_manager/config/tasks.yaml` to define your tasks
-- Modify `src/meme_launch_manager/crew.py` to add your own logic, tools and specific args
-- Modify `src/meme_launch_manager/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your flow and begin execution, run this from the root folder of your project:
+Set the API KEY in the .env file
 
 ```bash
-crewai run
+#LLM
+MODEL=
+GEMINI_API_KEY=
+
+#tavily
+TAVILY_API_KEY=
 ```
 
-This command initializes the meme-launch-manager Flow as defined in your configuration.
+Enter the command below to run it
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```bash
+crewai flow kickoff
+```
 
-## Understanding Your Crew
+Select the desired trending keyword
 
-The meme-launch-manager Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+```bash
+[Trending Keyword]
+1. Keyword
+2. Keyword
+3. Keyword
 
-## Support
+✅ Select the number of the trend you want:
+```
 
-For support, questions, or feedback regarding the {{crew_name}} Crew or crewAI.
+# Project Details
 
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+## Trending Scraper
 
-Let's create wonders together with the power and simplicity of crewAI.
-# meme-launch-manager
+## Meme Deployer
