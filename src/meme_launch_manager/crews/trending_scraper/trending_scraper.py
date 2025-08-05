@@ -1,64 +1,152 @@
+import sys, os
+from dotenv import load_dotenv
+from datetime import datetime
+
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+sys.path.append(BASE_DIR)
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai.agents.agent_builder.base_agent import BaseAgent
-from typing import List
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+from crewai_tools import FileWriterTool, SeleniumScrapingTool, FileReadTool
+from crewai_tools.tools.tavily_search_tool.tavily_search_tool import TavilySearchTool
+
+
+# signal_scraping_tool = SeleniumScrapingTool(website_url='https://signal.bz/',css_element='.container',wait_time=5)
+namunews_scraping_tool = SeleniumScrapingTool(
+    website_url="https://namu.news/", wait_time=5
+)
+x_scraping_tool = SeleniumScrapingTool(
+    website_url="https://getdaytrends.com/ko/korea/", css_element="#trends", wait_time=5
+)
+google_scraping_tool = SeleniumScrapingTool(
+    website_url="https://trends.google.com/trending?geo=KR&hours=24",
+    css_element=".enOdEe-wZVHld-zg7Cn",
+    wait_time=5,
+)
+
+# signal_writer_tool = FileWriterTool(file_name="signal.md", directory="output", overwrite=True )
+namunews_writer_tool = FileWriterTool(
+    file_name="namunews.md", directory="output", overwrite=True
+)
+x_writer_tool = FileWriterTool(file_name="x.md", directory="output", overwrite=True)
+google_writer_tool = FileWriterTool(
+    file_name="google.md", directory="output", overwrite=True
+)
+
+namunews_read_tool = FileReadTool(file_path="../../output/namunews.md")
+x_read_tool = FileReadTool(file_path="../../output/x.md")
+google_read_tool = FileReadTool(file_path="../../output/google.md")
+scrapped_site_read_tool = FileReadTool(file_path="../../output/scrapped_site.md")
+trend_read_tool = FileReadTool(file_path="../../output/trend.md")
+
+
+file_writer_tool = FileWriterTool(
+    file_name="scrapped_site.md", directory="output", overwrite=True
+)
+trend_writer_tool = FileWriterTool(
+    file_name="trend.md", directory="output", overwrite=True
+)
+final_writer_tool = FileWriterTool(
+    file_name="final.md", directory="output", overwrite=True
+)
+
+tavily_tool = TavilySearchTool()
+
+now_date = datetime.now().isoformat()
+
 
 @CrewBase
-class TrendingScraper():
-    """TrendingScraper crew"""
+class TrendingScraperCrew:
+    """TrendingScraperCrew crew"""
 
-    agents: List[BaseAgent]
-    tasks: List[Task]
+    agents_config = "config/agents.yaml"
+    tasks_config = "config/tasks.yaml"
 
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
+    # === Agents ===
     @agent
-    def researcher(self) -> Agent:
+    def namunews_trending_scraper(self) -> Agent:
         return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
-            verbose=True
+            config=self.agents_config["namunews_trending_scraper"],
+            tools=[namunews_scraping_tool, namunews_writer_tool],
+        )
+
+    # @agent
+    # def signal_trending_scraper(self) -> Agent:
+    #     return Agent(
+    #         config=self.agents_config["signal_trending_scraper"],
+    #         tools=[signal_scraping_tool, signal_writer_tool],
+    #     )
+
+    @agent
+    def x_trending_crawler(self) -> Agent:
+        return Agent(
+            config=self.agents_config["x_trending_crawler"],
+            tools=[x_scraping_tool, x_writer_tool],
         )
 
     @agent
-    def reporting_analyst(self) -> Agent:
+    def google_trending_scraper(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
-            verbose=True
+            config=self.agents_config["google_trending_scraper"],
+            tools=[google_scraping_tool, google_writer_tool],
         )
 
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
+    @agent
+    def trending_organizer(self) -> Agent:
+        return Agent(
+            config=self.agents_config["trending_organizer"],
+            tools=[x_read_tool, google_read_tool, namunews_read_tool, file_writer_tool],
+        )
+
+    @agent
+    def cross_validation_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config["cross_validation_agent"],
+            tools=[scrapped_site_read_tool, trend_writer_tool],
+        )
+
+    @agent
+    def trend_explainer(self) -> Agent:
+        return Agent(
+            config=self.agents_config["trend_explainer"],
+            tools=[trend_read_tool, final_writer_tool, tavily_tool],
+        )
+
+    # === Tasks ===
     @task
-    def research_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
-        )
+    def collect_namunews_trending(self) -> Task:
+        return Task(config=self.tasks_config["collect_namunews_trending"])
+
+    # @task
+    # def collect_signal_trending(self) -> Task:
+    #     return Task(config=self.tasks_config["collect_signal_trending"])
 
     @task
-    def reporting_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
-        )
+    def collect_x_trending(self) -> Task:
+        return Task(config=self.tasks_config["collect_x_trending"])
 
+    @task
+    def collect_google_trending(self) -> Task:
+        return Task(config=self.tasks_config["collect_google_trending"])
+
+    @task
+    def organize_trending(self) -> Task:
+        return Task(config=self.tasks_config["organize_trending"])
+
+    @task
+    def cross_validate_trending(self) -> Task:
+        return Task(config=self.tasks_config["cross_validate_trending"])
+
+    @task
+    def explain_trends(self) -> Task:
+        return Task(config=self.tasks_config["explain_trends"])
+
+    # === Crew ===
     @crew
     def crew(self) -> Crew:
-        """Creates the TrendingScraper crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )

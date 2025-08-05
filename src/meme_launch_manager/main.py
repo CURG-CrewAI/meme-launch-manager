@@ -1,52 +1,44 @@
 #!/usr/bin/env python
 from random import randint
-
 from pydantic import BaseModel
-
 from crewai.flow import Flow, listen, start
 
-from meme_launch_manager.crews.poem_crew.poem_crew import PoemCrew
+from meme_launch_manager.crews.trending_scraper.trending_scraper import (
+    TrendingScraperCrew,
+)
+from utils.user_selectors import user_select_trend_from_markdown
 
 
-class PoemState(BaseModel):
-    sentence_count: int = 1
-    poem: str = ""
+class MemeLaunchFlowState(BaseModel):
+    selected_trend: str = ""
 
 
-class PoemFlow(Flow[PoemState]):
+class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
     @start()
-    def generate_sentence_count(self):
-        print("Generating sentence count")
-        self.state.sentence_count = randint(1, 5)
+    def run_scraping_crew(self):
+        print("👀 Looking for trends in South Korea.")
+        TrendingScraperCrew().crew().kickoff()
 
-    @listen(generate_sentence_count)
-    def generate_poem(self):
-        print("Generating poem")
-        result = (
-            PoemCrew()
-            .crew()
-            .kickoff(inputs={"sentence_count": self.state.sentence_count})
-        )
+    @listen(run_scraping_crew)
+    def user_select_trend(self):
+        selected = user_select_trend_from_markdown()
+        self.state.selected_trend = selected
 
-        print("Poem generated", result.raw)
-        self.state.poem = result.raw
-
-    @listen(generate_poem)
-    def save_poem(self):
-        print("Saving poem")
-        with open("poem.txt", "w") as f:
-            f.write(self.state.poem)
+    @listen(user_select_trend)
+    def display_result(self):
+        print("\n📢 The trending keyword you selected:\n")
+        print(self.state.selected_trend)
 
 
 def kickoff():
-    poem_flow = PoemFlow()
-    poem_flow.kickoff()
+    flow = MemeLaunchFlow()
+    flow.kickoff()
 
 
 def plot():
-    poem_flow = PoemFlow()
-    poem_flow.plot()
+    flow = MemeLaunchFlow()
+    flow.plot()
 
 
 if __name__ == "__main__":

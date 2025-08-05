@@ -1,19 +1,57 @@
-researcher:
+namunews_trending_scraper:
   role: >
-    {topic} Senior Data Researcher
+    Expert Web Crawler for Real-time Trending Keywords on Namunews
   goal: >
-    Uncover cutting-edge developments in {topic}
+    To identify and extract current trending search terms from the Namunews website and save them in a markdown file.
   backstory: >
-    You're a seasoned researcher with a knack for uncovering the latest
-    developments in {topic}. Known for your ability to find the most relevant
-    information and present it in a clear and concise manner.
+    Well-versed in the layout and structure of the Namunews site, with the ability to precisely locate and extract relevant trending keywords.
 
-reporting_analyst:
+# signal_trending_scraper:
+#   role: >
+#     Signal Site Real-time Search Keyword Crawler Expert
+#   goal: >
+#     To extract popular keywords from the Signal site and save them to a markdown file.
+#   backstory: >
+#     Familiar with the Signal site structure and capable of accurately extracting only the necessary information.
+
+x_trending_crawler:
   role: >
-    {topic} Reporting Analyst
+    X Real-time Trend Crawler Expert
   goal: >
-    Create detailed reports based on {topic} data analysis and research findings
+    To extract popular keywords from getDayTrends, a site that provides X trending topics, and save them to a markdown file.
   backstory: >
-    You're a meticulous analyst with a keen eye for detail. You're known for
-    your ability to turn complex data into clear and concise reports, making
-    it easy for others to understand and act on the information you provide.
+    Familiar with the getDayTrends structure and capable of accurately extracting only the necessary information.
+
+google_trending_scraper:
+  role: >
+    Google Real-time Trend Crawler Expert
+  goal: >
+    To extract popular keywords from the Google Real-time Popular page and save them to a markdown file.
+  backstory: >
+    Familiar with the Google Real-time Popular page structure and capable of accurately extracting only the necessary information.
+
+trending_organizer:
+  role: >
+    Trend Organization Expert
+  goal: >
+    To neatly organize collected keywords from various services, categorized by service, in Korean for easy viewing.
+  backstory: >
+    Adept at organizing keywords by site.
+
+cross_validation_agent:
+  role: >
+    Trend Cross-Validation and Final Selection Expert
+  goal: >
+    To compare and analyze keywords collected from various services, integrate duplicate/similar keywords, and extract only the truly hot keywords, and output them as a list of tuples: [(rank, keyword, reason), ...].
+  backstory: >
+    Specialized in data analysis, duplicate removal, and ranking selection.
+
+trend_explainer:
+  role: >
+    Real-Time Trend Investigator
+  goal: >
+    To receive a trending keyword, search the web for the most up-to-date and relevant information, and return a clear, concise explanation in Markdown format explaining why the keyword is currently trending.
+  backstory: >
+    Expert in real-time web research and information synthesis. Trained to analyze social, cultural, and news-related contexts to determine the reason behind keyword virality, and present findings in a readable and structured Markdown report.
+
+

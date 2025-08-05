@@ -1,17 +1,85 @@
-research_task:
+collect_namunews_trending:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
+    Visit the Namunews website (https://namu.news/) and extract keywords currently trending in real time from its dedicated trending section. If a clearly defined section cannot be found, identify and collect keywords that are likely trending. Save the extracted results as a markdown file at output/namunews.md.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    A markdown file (output/namunews.md) listing the current trending keywords from Namunews, numbered in order.
+  agent: namunews_trending_scraper
 
-reporting_task:
+# collect_signal_trending:
+#   description: >
+#     Scrape only the child elements that appear to be real-time trending in the real-time trend area (<section class="container">) from the Signal site (https://signal.bz/) and save them as a markdown file (output/signal.md). If the area does not exist, freely extract what appears to be real-time trending keywords.
+#   expected_output: >
+#     A markdown file (output/signal.md) containing only the numbered real-time trending keywords from the Signal real-time trend area.
+#   agent: signal_trending_scraper
+
+collect_x_trending:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    From getdaytrends (https://getdaytrends.com/ko/korea/), a site that shows X (Twitter) trends, extract keywords from the area containing X trend keywords (<div id="trends">). Extract not only current trends but also all keywords from the past 24 hours. Then save them as a markdown file (output/x.md). If the area does not exist, freely extract what appears to be real-time trending keywords. (X is the same site as Twitter.)
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    A markdown file (output/x.md) containing only the numbered real-time trending keywords from X.
+  agent: x_trending_crawler
+
+collect_google_trending:
+  description: >
+    From Google Trends (e.g., https://trends.google.com/trending?geo=KR&hours=24), scrape only the child elements that appear to be real-time trending in the area (<table class="enOdEe-wZVHld-zg7Cn">) and save them as a markdown file (output/google.md). If the area does not exist, freely extract what appears to be real-time trending keywords.
+  expected_output: >
+    A markdown file (output/google.md) containing only the numbered real-time trending keywords from the Google real-time trend area.
+  agent: google_trending_scraper
+
+organize_trending:
+  description: >
+    Gather the trend keyword markdown files (output/x.md, output/google.md, output/namunews.md) collected from each service (namunews, X, Google) and organize them for easy viewing. Clearly separate each service by section so it is clear which site each keyword came from.
+  expected_output: >
+    A single markdown file (output/scrapped_site.md) with trend keywords organized by service.
+    Example:
+    ### Namunews Trends
+    1. Keyword1
+    2. Keyword2
+    ...
+    ### X Trends
+    1. KeywordA
+    2. KeywordB
+    ...
+  agent: trending_organizer
+
+cross_validate_trending:
+  description: >
+    Analyze the organized trend keyword data (output/scrapped_site.md from multiple services such as Namunews, X, and Google).
+    Identify the Top 3 keywords that appear most frequently across multiple services.
+    Sort these keywords by the number of mentions in descending order.
+
+    Save only the ranked keywords (without reasons) to a Markdown file `output/trend.md` in the following format:
+
+    1. Keyword
+    2. Keyword
+    3. Keyword
+
+  expected_output: >
+    A Markdown file named `trend.md` containing only the top 3 ranked keywords.
+  agent: cross_validation_agent
+
+explain_trends:
+  description: >
+    Read the top 3 trending keywords from the Markdown file `output/trend.md`.
+    Perform real-time web research for each keyword and generate a unified Markdown report that explains why each keyword is currently trending.
+
+  expected_output: >
+    A single Markdown file (e.g., output/final.md) containing three separate sections — one for each keyword read from `output/trend.md`.
+    Each section should clearly explain the background, related news, and social context that contribute to the keyword's popularity.
+
+    Example format:
+    # Now Top3 Trends
+
+    ## 1. Keyword: Barbenheimer  
+    **Why it's trending:**  
+    "Barbenheimer" is a viral trend referring to the simultaneous release of the movies *Barbie* and *Oppenheimer*. Their contrasting themes and fan-made memes created massive buzz across social media.  
+
+    ## 2. Keyword: Perfect CSAT Score  
+    **Why it's trending:**  
+    The announcement of a perfect scorer in the 2025 College Scholastic Ability Test (CSAT) drew attention in both media and online communities.  
+
+    ## 3. Keyword: AI Interview  
+    **Why it's trending:**  
+    AI-powered interviews are gaining popularity in corporate recruitment, leading to discussions about preparation strategies and ethical concerns.
+
+  agent: trend_explainer
