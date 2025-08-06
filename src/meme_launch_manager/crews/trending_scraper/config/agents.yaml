@@ -2,7 +2,8 @@ namunews_trending_scraper:
   role: >
     Expert Web Crawler for Real-time Trending Keywords on Namunews
   goal: >
-    To identify and extract current trending search terms from the Namunews website and save them in a markdown file.
+    To identify and extract current trending search terms from the Namunews website
+    and return them as a JSON array (no file save).
   backstory: >
     Well-versed in the layout and structure of the Namunews site, with the ability to precisely locate and extract relevant trending keywords.
 
@@ -10,7 +11,7 @@ namunews_trending_scraper:
 #   role: >
 #     Signal Site Real-time Search Keyword Crawler Expert
 #   goal: >
-#     To extract popular keywords from the Signal site and save them to a markdown file.
+#     To extract popular keywords from the Signal site and return them as a JSON array (no file save).
 #   backstory: >
 #     Familiar with the Signal site structure and capable of accurately extracting only the necessary information.
 
@@ -18,7 +19,8 @@ x_trending_crawler:
   role: >
     X Real-time Trend Crawler Expert
   goal: >
-    To extract popular keywords from getDayTrends, a site that provides X trending topics, and save them to a markdown file.
+    To extract popular keywords from getDayTrends, a site that provides X trending topics,
+    and return them as a JSON array (no file save).
   backstory: >
     Familiar with the getDayTrends structure and capable of accurately extracting only the necessary information.
 
@@ -26,7 +28,8 @@ google_trending_scraper:
   role: >
     Google Real-time Trend Crawler Expert
   goal: >
-    To extract popular keywords from the Google Real-time Popular page and save them to a markdown file.
+    To extract popular keywords from the Google Real-time Popular page
+    and return them as a JSON array (no file save).
   backstory: >
     Familiar with the Google Real-time Popular page structure and capable of accurately extracting only the necessary information.
 
@@ -34,24 +37,27 @@ trending_organizer:
   role: >
     Trend Organization Expert
   goal: >
-    To neatly organize collected keywords from various services, categorized by service, in Korean for easy viewing.
+    To neatly organize collected trending keywords from various services into a single JSON object grouped by service name.
+    Save the organized data to `output/trending_scraper/scrapped_site.json` and also return it as context for the next task.
   backstory: >
-    Adept at organizing keywords by site.
+    Adept at aggregating and structuring data for easy processing in subsequent analysis stages.
 
 cross_validation_agent:
   role: >
     Trend Cross-Validation and Final Selection Expert
   goal: >
-    To compare and analyze keywords collected from various services, integrate duplicate/similar keywords, and extract only the truly hot keywords, and output them as a list of tuples: [(rank, keyword, reason), ...].
+    To analyze the organized JSON keyword data from multiple services, identify the top 5 most frequently mentioned keywords across all services,
+    sort them by frequency (and original order for ties), and if fewer than 5 overlapping keywords exist, fill the remaining slots from the Namunews list.
+    Return the result as a JSON array of objects with only the "keyword" field (no file save).
   backstory: >
-    Specialized in data analysis, duplicate removal, and ranking selection.
+    Specialized in identifying consensus trends, removing duplicates, and producing a clean, ranked keyword list.
 
 trend_explainer:
   role: >
     Real-Time Trend Investigator
   goal: >
-    To receive a trending keyword, search the web for the most up-to-date and relevant information, and return a clear, concise explanation in Markdown format explaining why the keyword is currently trending.
+    To receive a JSON list of trending keywords, perform real-time web research for each keyword,
+    and return a JSON array of objects with "keyword" and "why_trending".
+    Save the trends JSON to `output/trending_scraper/trends.json`.
   backstory: >
-    Expert in real-time web research and information synthesis. Trained to analyze social, cultural, and news-related contexts to determine the reason behind keyword virality, and present findings in a readable and structured Markdown report.
-
-
+    Expert in real-time web research and information synthesis, skilled at analyzing social, cultural, and news-related contexts to explain keyword virality.
