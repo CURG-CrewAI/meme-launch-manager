@@ -1,17 +1,78 @@
-research_task:
+generate_token_metadata:
   description: >
-    Conduct a thorough research about {topic}
-    Make sure you find any interesting and relevant information given
-    the current year is {current_year}.
+    Given the trend "{keyword}" and reason "{why_trending}", create meme token metadata.
+    This includes a creative name, an all-uppercase symbol (3–6 letters), and a brief, witty description 
+    connecting the trend to meme culture.
+    The name should be catchy or playful, and the description should highlight why this token exists.
+    Return the result as a JSON object in context for the next task without saving it to a file.
   expected_output: >
-    A list with 10 bullet points of the most relevant information about {topic}
-  agent: researcher
+    A JSON object with the following structure:
+    {
+      "name": "<Token Name>",
+      "symbol": "<SYMBOL>",
+      "description": "<Witty, concise token description>"
+    }
+  agent: token_meta_generator
 
-reporting_task:
+generate_image_prompt:
   description: >
-    Review the context you got and expand each topic into a full section for a report.
-    Make sure the report is detailed and contains any and all relevant information.
+    Given the trend "{keyword}" and reason "{why_trending}", write a vivid and specific image generation prompt suitable for DALL·E, Midjourney, or other visual AI models.
+
+    The prompt must follow these core principles:
+
+    1. **ICONIC & MEMORABLE**: Describe a unique, snapshot-worthy visual that instantly conveys the subject’s relevance. Avoid generic compositions; focus on expressive moments, symbolic gestures, or dynamic framing.
+
+    2. **SYMBOLIC & THEMATIC**: Translate the “Why it’s trending” into meaningful visual metaphors or direct representations. Every element should reinforce the core theme or emotional resonance. Symbolic elements should only be used when directly relevant to the subject.
+
+    3. **STYLISTIC PRECISION**: Clearly state the desired artistic style (e.g., “photo-realistic”, “hyper-realistic cinematic render”, “digital pop-art”). Include lighting details (e.g., “golden hour glow”, “dramatic spotlight”), color palette (e.g., “team colors”, “ethereal pastels”), and overall atmosphere (e.g., “triumphant”, “reflective”, “urgent”).  
+       While cartoon or caricature styles are technically possible, **they should be avoided unless stylistically essential** to the trend's tone or audience.
+
+    4. **FOCUSED COMPOSITION**: Keep the main subject as the unambiguous focal point. Backgrounds should be clean, blurred, or symbolically relevant to enhance clarity.
+
+    5. **SPECIFIC VISUAL DETAILING**: Describe facial expression, posture, clothing details, props, and any relevant actions. Avoid vague descriptors.
+
+    6. **TECHNICAL CONTROL**:
+       - Append this negative prompt to filter undesirable outputs:  
+         `Negative prompt: blurry, text, low quality, deformed, bad anatomy, generic, watermark, oversaturated, unrealistic`
+
+    7. **REAL-PERSON HANDLING**:
+       - If the trend involves a real person, their **full name must appear** in the prompt.
+       - Describe them in detail: age range, hairstyle, facial features, clothing, typical context (e.g., stadium, press conference), and any signature accessories or gestures.
+       - **Do not use cartoon, stylized, caricature, or meme art styles** when depicting real people. Only use **photo-realistic**, **cinematic**, or **press-style** renderings to maintain likeness and respect.
+
+    Additional guideline:  
+    Use grounded and literal imagery. Avoid metaphorical or symbolic language unless it is directly relevant to the trend itself. Make the scene visually intentional by specifying the setting, background elements, mood, lighting, and overall atmosphere to create a vivid and unambiguous mental image.
+
+    Return the generated prompt directly in context for the next task without saving it to a file.
   expected_output: >
-    A fully fledged report with the main topics, each with a full section of information.
-    Formatted as markdown without '```'
-  agent: reporting_analyst
+    "<Single English paragraph image prompt>"
+
+  agent: visual_prompt_generator
+
+generate_image_from_file:
+  description: >
+    Use the image prompt from context to generate an image with DALL·E via the DalleTool.
+    Once the image is generated and the URL is available, use it to download and save the image 
+    to 'output/meme_deployer/images/token_image.png'.
+  expected_output: >
+    Final saved image confirmation message, e.g. "Image saved to output/meme_deployer/images/token_image.png"
+  agent: image_generator
+
+assemble_metadata:
+  description: >
+    Use the meme token metadata from context (fields: name, symbol, description) 
+    and combine it with the fixed image path 'output/meme_deployer/images/token_image.png'.
+
+    Create a Python dictionary named `final_token_metadata` with the structure:
+
+    final_token_metadata = {
+      "name": "...",
+      "symbol": "...",
+      "description": "...",
+      "image_path": "output/meme_deployer/images/token_image.png"
+    }
+
+    Save this dictionary into a Python file located at 'output/meme_deployer/final_token_metadata.py'.
+  expected_output: >
+    output/meme_deployer/final_token_metadata.py
+  agent: metadata_assembler
