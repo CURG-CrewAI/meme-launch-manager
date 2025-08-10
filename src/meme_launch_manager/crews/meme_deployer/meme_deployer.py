@@ -1,64 +1,62 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
+from crewai_tools import FileWriterTool, DallETool
 from typing import List
-# If you want to run a snippet of code before or after the crew starts,
-# you can use the @before_kickoff and @after_kickoff decorators
-# https://docs.crewai.com/concepts/crews#example-crew-class-with-decorators
+from meme_launch_manager.tools.download_image_tool import DownloadImageTool
+
+dalle_tool = DallETool(model="dall-e-3", size="1024x1024", quality="standard", n=1)
+
 
 @CrewBase
-class MemeDeployer():
-    """MemeDeployer crew"""
+class MemeDeployerCrew:
+    """MemeDeployerCrew"""
 
     agents: List[BaseAgent]
     tasks: List[Task]
 
-    # Learn more about YAML configuration files here:
-    # Agents: https://docs.crewai.com/concepts/agents#yaml-configuration-recommended
-    # Tasks: https://docs.crewai.com/concepts/tasks#yaml-configuration-recommended
-    
-    # If you would like to add tools to your agents, you can learn more about it here:
-    # https://docs.crewai.com/concepts/agents#agent-tools
     @agent
-    def researcher(self) -> Agent:
-        return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
-            verbose=True
-        )
+    def token_meta_generator(self) -> Agent:
+        return Agent(config=self.agents_config["token_meta_generator"], verbose=True)
 
-    @agent
-    def reporting_analyst(self) -> Agent:
-        return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
-            verbose=True
-        )
+    # @agent
+    # def visual_prompt_generator(self) -> Agent:
+    #     return Agent(config=self.agents_config["visual_prompt_generator"], verbose=True)
 
-    # To learn more about structured task outputs,
-    # task dependencies, and task callbacks, check out the documentation:
-    # https://docs.crewai.com/concepts/tasks#overview-of-a-task
-    @task
-    def research_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
-        )
+    # @agent
+    # def image_generator(self) -> Agent:
+    #     return Agent(
+    #         config=self.agents_config["image_generator"],
+    #         tools=[dalle_tool, DownloadImageTool()],
+    #         verbose=True,
+    #     )
+
+    # @agent
+    # def metadata_assembler(self) -> Agent:
+    #     return Agent(config=self.agents_config["metadata_assembler"], verbose=True)
 
     @task
-    def reporting_task(self) -> Task:
-        return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
-        )
+    def generate_token_metadata(self) -> Task:
+        return Task(config=self.tasks_config["generate_token_metadata"])
+
+    # @task
+    # def generate_image_prompt(self) -> Task:
+    #     return Task(config=self.tasks_config["generate_image_prompt"])
+
+    # @task
+    # def generate_image_from_file(self) -> Task:
+    #     return Task(config=self.tasks_config["generate_image_from_file"])
+
+    # @task
+    # def assemble_metadata(self) -> Task:
+    #     return Task(config=self.tasks_config["assemble_metadata"])
 
     @crew
     def crew(self) -> Crew:
         """Creates the MemeDeployer crew"""
-        # To learn how to add knowledge sources to your crew, check out the documentation:
-        # https://docs.crewai.com/concepts/knowledge#what-is-knowledge
-
         return Crew(
-            agents=self.agents, # Automatically created by the @agent decorator
-            tasks=self.tasks, # Automatically created by the @task decorator
+            agents=self.agents,
+            tasks=self.tasks,
             process=Process.sequential,
             verbose=True,
-            # process=Process.hierarchical, # In case you wanna use that instead https://docs.crewai.com/how-to/Hierarchical/
         )
