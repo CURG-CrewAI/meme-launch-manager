@@ -1,115 +1,83 @@
 #!/usr/bin/env python
-from pydantic import BaseModel
+from __future__ import annotations
+
+from pydantic import BaseModel, Field
 from crewai.flow import Flow, listen, start
-import json
-import ast
-from pathlib import Path
-import unicodedata
 
 from meme_launch_manager.crews.trending_scraper.trending_scraper import (
     TrendingScraperCrew,
 )
-from meme_launch_manager.crews.meme_deployer.meme_deployer import (
-    MemeDeployerCrew,
-)
+from meme_launch_manager.crews.meme_deployer.meme_deployer import MemeDeployerCrew
+
+from utils.trends_io import load_trends_from_file, parse_raw_trends
+from utils.cli import format_trends, prompt_choice, normalize_numeric
+from utils.selection import validate_choice, pick_trend
 
 
+# 플로우 스테이트 (트렌드 스크래핑해온 5개 저장 및 선택한 트렌드 저장)
 class MemeLaunchFlowState(BaseModel):
-    top_trends: list = []  # [{"keyword": "..."} ...]
-    selected_trend: dict | None = None  # ✅ 선택한 트렌드 저장
+    top_trends: list = Field(default_factory=list)
+    selected_trend: dict | None = None
 
 
 class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
+    # 트렌드를 스크래핑하고 플로우 스테이트에 담아서 다음 함수에게 전달
     @start()
     def run_scraping_crew(self):
         print("👀 Looking for trends in South Korea...")
         result = TrendingScraperCrew().crew().kickoff()
-        print("♻️", result.raw)
-        print("✨", result)
+        trends = load_trends_from_file("output/trending_scraper/trends.json")
+        if not trends:
+            trends = parse_raw_trends(result.raw)
 
-        trends_file = Path("output/trending_scraper/trends.json")
+        self.state.top_trends = trends or []
 
-        if trends_file.exists():
-            try:
-                with open(trends_file, "r", encoding="utf-8") as f:
-                    self.state.top_trends = json.load(f)
-                    print(f"📂 Loaded trends from {trends_file}")
-                    return
-            except json.JSONDecodeError as e:
-                print("❌ Failed to parse trends.json:", e)
-
-        raw_data = result.raw
-        if not raw_data:
-            print("⚠️ No output received from crew.")
-            self.state.top_trends = []
-        elif isinstance(raw_data, list):
-            self.state.top_trends = raw_data
-        elif isinstance(raw_data, str):
-            try:
-                self.state.top_trends = json.loads(raw_data)
-            except json.JSONDecodeError:
-                try:
-                    self.state.top_trends = ast.literal_eval(raw_data)
-                except (ValueError, SyntaxError):
-                    print("❌ Failed to parse output.")
-                    self.state.top_trends = []
-
+    # 플로우 스테이트에 담겨있는 트렌드를 가지고 유저에게 입력 받음 -> CLI에 출력 및 다시 플로우 스테이트에 저장
     @listen(run_scraping_crew)
     def display_result(self):
-        if not self.state.top_trends:
-            print("⚠️ 표시할 트렌드 데이터가 없습니다.")
+        trends = self.state.top_trends
+        if not trends:
+            print("⚠️ There are no trends to display.")
             return
 
-        print("\n📢 Top trending keywords with reasons:\n")
-        for idx, item in enumerate(self.state.top_trends, start=1):
-            keyword = item.get("keyword", "N/A")
-            reason = item.get("why_trending", "No explanation available.")
-            print(f"{idx}. {keyword} — {reason}")
+        print(format_trends(trends))
 
-        # 입력값 받기 + 정규화
-        choice_str = input("\n원하는 항목 번호를 선택하세요 (기본=1): ").strip()
-        print(f"[DEBUG] Raw input: {repr(choice_str)}")  # 입력값 디버그용 출력
+        # 현재 1~5가 아닌숫자나 문자등이 들어오면 무조건 1반환해서 생성하게 되어있음 나중에 루프 붙일때 수정 예정
+        raw = prompt_choice("Choose the trend keyword number you want.", default=1)
+        normalized = normalize_numeric(raw)
 
-        # 유니코드 숫자만 추출 (전각 포함)
-        choice_str = "".join(
-            ch for ch in choice_str if unicodedata.category(ch).startswith("N")
-        )
+        if raw.strip() == "":
+            print("⚠️ No input provided. Default (1) selected.")
+        elif normalized is None:
+            print("❌ Not a valid number. Default (1) selected.")
 
-        # 기본값 처리
-        if not choice_str:
-            choice = 1
-            print("ℹ️ 입력이 없어서 기본값(1) 선택")
-        else:
-            try:
-                choice = int(choice_str)
-            except ValueError:
-                print("❌ 숫자 형식이 아닙니다. 기본값(1) 선택")
-                choice = 1
+        choice = validate_choice(normalized, max_len=len(trends), default=1)
+        if (normalized is not None) and (choice != normalized):
+            print("❌ Invalid number. Default (1) selected.")
 
-        # 선택 검증
-        if 1 <= choice <= len(self.state.top_trends):
-            self.state.selected_trend = self.state.top_trends[choice - 1]
-            print(f"\n✅ 선택한 키워드: {self.state.selected_trend['keyword']}")
-            print(f"📖 이유: {self.state.selected_trend['why_trending']}")
-        else:
-            print("❌ 잘못된 번호입니다. 기본값(1) 선택")
-            self.state.selected_trend = self.state.top_trends[0]
+        selected = pick_trend(trends, choice)
+        self.state.selected_trend = selected
 
+        if selected:
+            print(f"\n✅ Selected keyword: {selected.get('keyword','N/A')}")
+
+    # 플로우스테이트에서 선택된 트렌드 확인후 밈토큰 메타데이터및 이미지 생성
     @listen(display_result)
     def run_meme_deployer(self):
-        if self.state.selected_trend is None:  # ✅ 수정
-            print("⚠️ 선택된 트렌드가 없습니다.")
+        trend = self.state.selected_trend
+        if not trend:
+            print("⚠️ No trend selected")
             return
 
         inputs = {
-            "keyword": self.state.selected_trend["keyword"],
-            "why_trending": self.state.selected_trend["why_trending"],
+            "keyword": trend["keyword"],
+            "why_trending": trend["why_trending"],
         }
         result = MemeDeployerCrew().crew().kickoff(inputs=inputs)
 
-        print("\n=== 최종 Meme Token Metadata ===\n")
-        print(result.raw)  # 최종 딕셔너리 출력
+        print("\n=== Final Meme Token Metadata ===\n")
+        print(result.raw)
 
 
 def kickoff():
