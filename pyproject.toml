@@ -7,12 +7,15 @@ requires-python = ">=3.10,<3.14"
 dependencies = [
     "crewai[tools]>=0.148.0,<1.0.0",
     "tavily-python>=0.7.10",
+    "python-telegram-bot>=21.0",
+    "python-dotenv>=1.0.0",
 ]
 
 [project.scripts]
 kickoff = "meme_launch_manager.main:kickoff"
 run_crew = "meme_launch_manager.main:kickoff"
 plot = "meme_launch_manager.main:plot"
+telegram_bot = "telegram_bot.bot:main"
 
 [build-system]
 requires = ["hatchling"]
