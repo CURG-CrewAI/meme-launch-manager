@@ -1,85 +1,105 @@
 collect_namunews_trending:
   description: >
-    Visit the Namunews website (https://namu.news/) and extract keywords currently trending in real time from its dedicated trending section. If a clearly defined section cannot be found, identify and collect keywords that are likely trending. Save the extracted results as a markdown file at output/namunews.md.
+    Visit the Namunews website (https://namu.news/) and extract keywords currently trending in real time from its dedicated trending section.
+    If a clearly defined section cannot be found, identify and collect keywords that are likely trending.
+    Return the extracted results as a JSON array in rank order without saving to a file.
   expected_output: >
-    A markdown file (output/namunews.md) listing the current trending keywords from Namunews, numbered in order.
+    JSON array containing the current trending keywords from Namunews,
+    ordered by rank (e.g., ["Keyword1", "Keyword2", "Keyword3", ...]).
   agent: namunews_trending_scraper
 
 # collect_signal_trending:
 #   description: >
-#     Scrape only the child elements that appear to be real-time trending in the real-time trend area (<section class="container">) from the Signal site (https://signal.bz/) and save them as a markdown file (output/signal.md). If the area does not exist, freely extract what appears to be real-time trending keywords.
+#     Scrape only the child elements that appear to be real-time trending in the real-time trend area (<section class="container">)
+#     from the Signal site (https://signal.bz/) and return the extracted results as a JSON array in rank order without saving to a file.
+#     If the area does not exist, freely extract what appears to be real-time trending keywords.
 #   expected_output: >
-#     A markdown file (output/signal.md) containing only the numbered real-time trending keywords from the Signal real-time trend area.
+#     JSON array containing the current trending keywords from signal,
+#     ordered by rank (e.g., ["Keyword1", "Keyword2", "Keyword3", ...]).
 #   agent: signal_trending_scraper
 
 collect_x_trending:
   description: >
-    From getdaytrends (https://getdaytrends.com/ko/korea/), a site that shows X (Twitter) trends, extract keywords from the area containing X trend keywords (<div id="trends">). Extract not only current trends but also all keywords from the past 24 hours. Then save them as a markdown file (output/x.md). If the area does not exist, freely extract what appears to be real-time trending keywords. (X is the same site as Twitter.)
+    From getdaytrends (https://getdaytrends.com/ko/korea/), a site that shows X (Twitter) trends,
+    extract keywords from the area containing X trend keywords (<div id="trends">).
+    Extract not only current trends but also all keywords from the past 24 hours.
+    Return the extracted results as a JSON array in rank order without saving to a file.
+    If the area does not exist, freely extract what appears to be real-time trending keywords. (X is the same site as Twitter.)
   expected_output: >
-    A markdown file (output/x.md) containing only the numbered real-time trending keywords from X.
+    JSON array of current and past 24h trending keywords from X
+    ordered by rank. (e.g., ["Keyword1", "Keyword2", "Keyword3", ...]).
   agent: x_trending_crawler
 
 collect_google_trending:
   description: >
-    From Google Trends (e.g., https://trends.google.com/trending?geo=KR&hours=24), scrape only the child elements that appear to be real-time trending in the area (<table class="enOdEe-wZVHld-zg7Cn">) and save them as a markdown file (output/google.md). If the area does not exist, freely extract what appears to be real-time trending keywords.
+    From Google Trends (e.g., https://trends.google.com/trending?geo=KR&hours=24),
+    scrape only the child elements that appear to be real-time trending in the area (<table class="enOdEe-wZVHld-zg7Cn">).
+    Return the extracted results as a JSON array in rank order without saving to a file.
+    If the area does not exist, freely extract what appears to be real-time trending keywords.
   expected_output: >
-    A markdown file (output/google.md) containing only the numbered real-time trending keywords from the Google real-time trend area.
+    JSON array of the current trending keywords from Google Trends,
+    ordered by rank.(e.g., ["Keyword1", "Keyword2", "Keyword3", ...]).
   agent: google_trending_scraper
 
 organize_trending:
   description: >
-    Gather the trend keyword markdown files (output/x.md, output/google.md, output/namunews.md) collected from each service (namunews, X, Google) and organize them for easy viewing. Clearly separate each service by section so it is clear which site each keyword came from.
+    Gather the trend keyword JSON arrays from context (results of Namunews, X, Google, and Signal scrapers)
+    and combine them into a single JSON object grouped by source.
+    Each key in the JSON object should be the service name (e.g., "namunews", "x", "google", "signal")
+    and the value should be an array of keywords in order of ranking.
+    Save this combined object to `output/trending_scraper/scrapped_site.json` and also return it as context for the next task.
   expected_output: >
-    A single markdown file (output/scrapped_site.md) with trend keywords organized by service.
-    Example:
-    ### Namunews Trends
-    1. Keyword1
-    2. Keyword2
-    ...
-    ### X Trends
-    1. KeywordA
-    2. KeywordB
-    ...
+    A JSON object structured as:
+    {
+      "namunews": ["정우성", "시드니", "안우진", ...],
+      "x": ["안우진", "정우성", "손흥민", ...],
+      "google": ["정우성", "민생지원금", "손흥민", ...],
+      "signal": ["시드니", "손흥민", "정우성", ...]
+    }
   agent: trending_organizer
 
 cross_validate_trending:
   description: >
-    Analyze the organized trend keyword data (output/scrapped_site.md from multiple services such as Namunews, X, and Google).
-    Identify the Top 3 keywords that appear most frequently across multiple services.
+    Analyze the organized trend keyword data from context (output of `organize_trending`) that contains keyword arrays
+    for each service (Namunews, X, Google, Signal).
+    Identify the Top 5 keywords that appear most frequently across multiple services.
     Sort these keywords by the number of mentions in descending order.
+    If two or more keywords have the same number of mentions, maintain their relative order from the original lists.
 
-    Save only the ranked keywords (without reasons) to a Markdown file `output/trend.md` in the following format:
+    If there are fewer than 5 keywords that appear across multiple services (due to lack of overlaps),
+    fill the remaining slots by taking keywords from the Namunews list in order of appearance until the list has exactly 5 items.
 
-    1. Keyword
-    2. Keyword
-    3. Keyword
-
+    Return the results as a JSON array where each item is an object with a "keyword" key, without saving to a file.
   expected_output: >
-    A Markdown file named `trend.md` containing only the top 3 ranked keywords.
+    JSON array containing exactly 5 items, each in the format:
+    [
+      {"keyword": "정우성"},
+      {"keyword": "안우진"},
+      {"keyword": "시드니"},
+      {"keyword": "손흥민"},
+      {"keyword": "민생지원금"}
+    ]
   agent: cross_validation_agent
 
 explain_trends:
   description: >
-    Read the top 3 trending keywords from the Markdown file `output/trend.md`.
-    Perform real-time web research for each keyword and generate a unified Markdown report that explains why each keyword is currently trending.
+    Receive the top 5 trending keywords as context (output of `cross_validate_trending`).
+    Perform real-time web research for each keyword and return a JSON array where each item is an object containing:
+      - "keyword": the keyword string
+      - "why_trending": a concise explanation in English
+    The explanation must be based on the most recent and relevant information.
+
+    Save the JSON array to `output/trending_scraper/trends.json` (overwrite if exists).
+    Return exactly the same JSON array as the final output.
 
   expected_output: >
-    A single Markdown file (e.g., output/final.md) containing three separate sections — one for each keyword read from `output/trend.md`.
-    Each section should clearly explain the background, related news, and social context that contribute to the keyword's popularity.
-
-    Example format:
-    # Now Top3 Trends
-
-    ## 1. Keyword: Barbenheimer  
-    **Why it's trending:**  
-    "Barbenheimer" is a viral trend referring to the simultaneous release of the movies *Barbie* and *Oppenheimer*. Their contrasting themes and fan-made memes created massive buzz across social media.  
-
-    ## 2. Keyword: Perfect CSAT Score  
-    **Why it's trending:**  
-    The announcement of a perfect scorer in the 2025 College Scholastic Ability Test (CSAT) drew attention in both media and online communities.  
-
-    ## 3. Keyword: AI Interview  
-    **Why it's trending:**  
-    AI-powered interviews are gaining popularity in corporate recruitment, leading to discussions about preparation strategies and ethical concerns.
-
+    A valid JSON array, exactly in this format:
+    [
+      {"keyword": "정우성", "why_trending": "Marriage rumors sparked discussions."},
+      {"keyword": "안우진", "why_trending": "Shoulder injury during military service raised concerns."},
+      {"keyword": "시드니", "why_trending": "Advertising slogan controversy sparked debates."},
+      {"keyword": "손흥민", "why_trending": "Praised for recent performance and interviews."},
+      {"keyword": "민생지원금", "why_trending": "Government's new financial aid announcement."}
+    ]
+    Do not include any text or explanation outside this JSON.
   agent: trend_explainer
