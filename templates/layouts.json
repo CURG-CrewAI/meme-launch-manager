@@ -1,0 +1,224 @@
+[
+  {
+    "name": "Floating Island",
+    "hero_alignment": "center",
+    "image_position": "top",
+    "section_order": ["hero", "about", "tokenomics", "community"],
+    "font_style": "Fredoka One",
+    "animation": "float",
+    "button_style": "neon-hover",
+    "keywords": [
+      "floating",
+      "light",
+      "island",
+      "centered",
+      "cloud",
+      "soft",
+      "dreamy",
+      "calm"
+    ]
+  },
+  {
+    "name": "Split Screen Chaos",
+    "hero_alignment": "left",
+    "image_position": "right",
+    "section_order": ["hero", "tokenomics", "community", "about"],
+    "font_style": "Rubik Doodle Shadow",
+    "animation": "wiggle",
+    "button_style": "split-gradient",
+    "keywords": [
+      "chaos",
+      "crazy",
+      "unexpected",
+      "dual",
+      "satirical",
+      "ironic",
+      "parody",
+      "lol"
+    ]
+  },
+  {
+    "name": "Cyber Terminal",
+    "hero_alignment": "right",
+    "image_position": "left",
+    "section_order": ["hero", "community", "tokenomics", "about"],
+    "font_style": "Source Code Pro",
+    "animation": "glitch",
+    "button_style": "matrix-hack",
+    "keywords": [
+      "hacker",
+      "matrix",
+      "code",
+      "cyber",
+      "system",
+      "ai",
+      "dark",
+      "serious"
+    ]
+  },
+  {
+    "name": "Retro Arcade",
+    "hero_alignment": "center",
+    "image_position": "top",
+    "section_order": ["hero", "about", "tokenomics", "community"],
+    "font_style": "VT323",
+    "animation": "flicker",
+    "button_style": "pixelated",
+    "keywords": [
+      "retro",
+      "arcade",
+      "pixel",
+      "8bit",
+      "oldschool",
+      "nostalgic",
+      "throwback"
+    ]
+  },
+  {
+    "name": "Minimal Meme",
+    "hero_alignment": "center",
+    "image_position": "top",
+    "section_order": ["hero", "about", "community", "tokenomics"],
+    "font_style": "Quicksand",
+    "animation": "none",
+    "button_style": "ghost-center",
+    "keywords": [
+      "minimal",
+      "clean",
+      "simple",
+      "quiet",
+      "elegant",
+      "understated",
+      "reserved"
+    ]
+  },
+  {
+    "name": "Party Chaos",
+    "hero_alignment": "left",
+    "image_position": "right",
+    "section_order": ["hero", "about", "tokenomics", "community"],
+    "font_style": "Press Start 2P",
+    "animation": "bounce",
+    "button_style": "rainbow-border",
+    "keywords": [
+      "fun",
+      "bright",
+      "colorful",
+      "party",
+      "comic",
+      "emoji",
+      "crazy",
+      "lmao"
+    ]
+  },
+  {
+    "name": "Galaxy Rise",
+    "hero_alignment": "center",
+    "image_position": "top",
+    "section_order": ["hero", "tokenomics", "about", "community"],
+    "font_style": "Audiowide",
+    "animation": "pulse",
+    "button_style": "glowing-astro",
+    "keywords": [
+      "galaxy",
+      "cosmic",
+      "space",
+      "orbit",
+      "astro",
+      "futuristic",
+      "optimistic"
+    ]
+  },
+  {
+    "name": "Brain Spectrum",
+    "hero_alignment": "right",
+    "image_position": "right",
+    "section_order": ["hero", "community", "about", "tokenomics"],
+    "font_style": "Pacifico",
+    "animation": "zoom",
+    "button_style": "swirl-border",
+    "keywords": [
+      "logic",
+      "analytical",
+      "data",
+      "serious",
+      "creativity",
+      "art",
+      "expression",
+      "vivid"
+    ]
+  },
+  {
+    "name": "Victory Rush",
+    "hero_alignment": "center",
+    "image_position": "top",
+    "section_order": ["hero", "about", "community", "tokenomics"],
+    "font_style": "Anton",
+    "animation": "wave",
+    "button_style": "victory-flash",
+    "keywords": [
+      "fast",
+      "speed",
+      "race",
+      "sports",
+      "stadium",
+      "energy",
+      "goal",
+      "victory"
+    ]
+  },
+  {
+    "name": "Gothic Shadows",
+    "hero_alignment": "center",
+    "image_position": "top",
+    "section_order": ["hero", "about", "community", "tokenomics"],
+    "font_style": "UnifrakturCook",
+    "animation": "fade-glow",
+    "button_style": "gothic-border",
+    "keywords": [
+      "gothic",
+      "dark",
+      "mystical",
+      "horror",
+      "spooky",
+      "ritual",
+      "mystery"
+    ]
+  },
+  {
+    "name": "Idol Glow",
+    "hero_alignment": "center",
+    "image_position": "top",
+    "section_order": ["hero", "about", "tokenomics", "community"],
+    "font_style": "Great Vibes",
+    "animation": "shimmer",
+    "button_style": "sparkle-heart",
+    "keywords": [
+      "idol",
+      "romantic",
+      "fandom",
+      "dreamy",
+      "glamorous",
+      "k-pop",
+      "love"
+    ]
+  },
+  {
+    "name": "Protest Pulse",
+    "hero_alignment": "left",
+    "image_position": "left",
+    "section_order": ["hero", "tokenomics", "about", "community"],
+    "font_style": "Impact",
+    "animation": "shake-wave",
+    "button_style": "bold-solid",
+    "keywords": [
+      "activism",
+      "protest",
+      "movement",
+      "voice",
+      "solidarity",
+      "political",
+      "bold"
+    ]
+  }
+]

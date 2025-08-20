@@ -1,0 +1,262 @@
+[
+  {
+    "name": "Dreamy Pastel",
+    "keywords": ["dream", "love", "memory", "peace", "starlight", "beloved"],
+    "colors": {
+      "primary": "#EEDCFF",
+      "secondary": "#FFFCE1",
+      "text": "#1F1B3A",
+      "background": "#FFFFFF"
+    }
+  },
+  {
+    "name": "Chaos Pop",
+    "keywords": [
+      "chaos",
+      "crazy",
+      "lol",
+      "unexpected",
+      "exploding",
+      "rekt",
+      "satirical",
+      "satire",
+      "tongue-in-cheek",
+      "ironic"
+    ],
+    "colors": {
+      "primary": "#00FF9F",
+      "secondary": "#FF00F5",
+      "text": "#000000",
+      "background": "#FFF633"
+    }
+  },
+  {
+    "name": "Emoji Rainbow",
+    "keywords": ["emoji", "😂", "🔥", "🚀", "💥", "party", "lmao"],
+    "colors": {
+      "primary": "#FF4A4A",
+      "secondary": "#FFFF00",
+      "text": "#111111",
+      "background": "#FFF8E7"
+    }
+  },
+  {
+    "name": "Cyber Hack",
+    "keywords": ["matrix", "hacker", "glitch", "ai", "code", "cyber", "system"],
+    "colors": {
+      "primary": "#00FFCC",
+      "secondary": "#0F0F0F",
+      "text": "#33FF33",
+      "background": "#000000"
+    }
+  },
+  {
+    "name": "Retro Night",
+    "keywords": [
+      "retro",
+      "arcade",
+      "pixel",
+      "8bit",
+      "game",
+      "nostalgic",
+      "nostalgia"
+    ],
+    "colors": {
+      "primary": "#FF7518",
+      "secondary": "#1BFFFF",
+      "text": "#FFFFFF",
+      "background": "#000000"
+    }
+  },
+  {
+    "name": "Pink Pixel",
+    "keywords": ["blocky", "minecraft", "pixel", "8bit", "party", "block"],
+    "colors": {
+      "primary": "#FF66B2",
+      "secondary": "#FFEEA8",
+      "text": "#3B0A55",
+      "background": "#FFF7FA"
+    }
+  },
+  {
+    "name": "Soft Minimal",
+    "keywords": [
+      "minimal",
+      "simple",
+      "clean",
+      "quiet",
+      "elegant",
+      "understated",
+      "austere",
+      "muted"
+    ],
+    "colors": {
+      "primary": "#FFFFFF",
+      "secondary": "#F5F5F5",
+      "text": "#1F2937",
+      "background": "#FFFFFF"
+    }
+  },
+  {
+    "name": "Utility Gray",
+    "keywords": [
+      "logic",
+      "utility",
+      "data",
+      "smart",
+      "function",
+      "left",
+      "austere",
+      "serious",
+      "cautious",
+      "muted",
+      "understated",
+      "cynical"
+    ],
+    "colors": {
+      "primary": "#8E8E93",
+      "secondary": "#E5E5EA",
+      "text": "#1C1C1E",
+      "background": "#FFFFFF"
+    }
+  },
+  {
+    "name": "Default Blue",
+    "keywords": ["default", "standard", "classic", "token"],
+    "colors": {
+      "primary": "#4F46E5",
+      "secondary": "#A5B4FC",
+      "text": "#111827",
+      "background": "#FFFFFF"
+    }
+  },
+  {
+    "name": "Galactic Neon",
+    "keywords": ["galaxy", "space", "astro", "cosmic", "orbit", "alien"],
+    "colors": {
+      "primary": "#6C63FF",
+      "secondary": "#E1F5FE",
+      "text": "#130F40",
+      "background": "#F2F4F8"
+    }
+  },
+  {
+    "name": "Ancient Scroll",
+    "keywords": [
+      "ancient",
+      "scroll",
+      "myth",
+      "magic",
+      "wisdom",
+      "celestial",
+      "commemorative",
+      "ceremonial",
+      "memorial",
+      "heritage"
+    ],
+    "colors": {
+      "primary": "#BBA87F",
+      "secondary": "#FFF8DC",
+      "text": "#2E2B1B",
+      "background": "#FBF6EC"
+    }
+  },
+  {
+    "name": "Terminal Dark",
+    "keywords": [
+      "terminal",
+      "cli",
+      "console",
+      "linux",
+      "dark",
+      "cautious",
+      "serious",
+      "skeptical",
+      "audit"
+    ],
+    "colors": {
+      "primary": "#00FF00",
+      "secondary": "#1B1B1B",
+      "text": "#00FF00",
+      "background": "#000000"
+    }
+  },
+  {
+    "name": "Alpha Gains",
+    "keywords": ["chad", "gym", "strong", "moon", "gains", "rocket", "pump"],
+    "colors": {
+      "primary": "#FF4500",
+      "secondary": "#FFD700",
+      "text": "#000000",
+      "background": "#F0F0F0"
+    }
+  },
+  {
+    "name": "Speed Blaze",
+    "keywords": ["fast", "speed", "race", "lfg", "run", "flash"],
+    "colors": {
+      "primary": "#FF3131",
+      "secondary": "#F9D923",
+      "text": "#101820",
+      "background": "#FFFBE6"
+    }
+  },
+  {
+    "name": "Art Pop",
+    "keywords": ["creativity", "art", "vivid", "expression", "paint", "right"],
+    "colors": {
+      "primary": "#7D5FFF",
+      "secondary": "#FEC8D8",
+      "text": "#1F1F1F",
+      "background": "#FFFBF0"
+    }
+  },
+  {
+    "name": "Golden Meme",
+    "keywords": [
+      "legendary",
+      "gold",
+      "rich",
+      "elite",
+      "top",
+      "trophy",
+      "commemorative",
+      "award",
+      "ceremony"
+    ],
+    "colors": {
+      "primary": "#FFD700",
+      "secondary": "#FFF8DC",
+      "text": "#000000",
+      "background": "#FFFBE6"
+    }
+  },
+  {
+    "name": "Gothic Noir",
+    "keywords": ["gothic", "dark", "mystical", "horror", "shadow", "spooky"],
+    "colors": {
+      "primary": "#2B2B2B",
+      "secondary": "#6B21A8",
+      "text": "#E4E4E7",
+      "background": "#0F0F0F"
+    }
+  },
+  {
+    "name": "Idol Neon",
+    "keywords": [
+      "idol",
+      "stage",
+      "glitter",
+      "fan",
+      "k-pop",
+      "romantic",
+      "glam"
+    ],
+    "colors": {
+      "primary": "#FF77E9",
+      "secondary": "#77E0FF",
+      "text": "#1A1A1A",
+      "background": "#FFF0FB"
+    }
+  }
+]
