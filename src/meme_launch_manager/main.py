@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 from __future__ import annotations
+import json
+import os
 
 from pydantic import BaseModel, Field
 from crewai.flow import Flow, listen, start
@@ -8,16 +10,21 @@ from meme_launch_manager.crews.trending_scraper.trending_scraper import (
     TrendingScraperCrew,
 )
 from meme_launch_manager.crews.meme_deployer.meme_deployer import MemeDeployerCrew
+from meme_launch_manager.crews.website_developer.website_developer import (
+    WebsiteDeveloper,
+)
 
 from utils.trends_io import load_trends_from_file, parse_raw_trends
-from utils.cli import format_trends, prompt_choice, normalize_numeric
+from utils.cli import format_trends, prompt_choice, normalize_numeric, prompt_make_site
 from utils.selection import validate_choice, pick_trend
 
 
-# 플로우 스테이트 (트렌드 스크래핑해온 5개 저장 및 선택한 트렌드 저장)
+# 플로우 스테이트 (트렌드 스크래핑해온 5개 저장 및 선택한 트렌드 저장 and 웹사이트 생성 찬반, 토큰메타데이터 저장)
 class MemeLaunchFlowState(BaseModel):
     top_trends: list = Field(default_factory=list)
     selected_trend: dict | None = None
+    make_website: bool = False
+    token_meta: dict | None = None
 
 
 class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
@@ -30,7 +37,6 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         trends = load_trends_from_file("output/trending_scraper/trends.json")
         if not trends:
             trends = parse_raw_trends(result.raw)
-
         self.state.top_trends = trends or []
 
     # 플로우 스테이트에 담겨있는 트렌드를 가지고 유저에게 입력 받음 -> CLI에 출력 및 다시 플로우 스테이트에 저장
@@ -40,7 +46,6 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         if not trends:
             print("⚠️ There are no trends to display.")
             return
-
         print(format_trends(trends))
 
         # 현재 1~5가 아닌숫자나 문자등이 들어오면 무조건 1반환해서 생성하게 되어있음 나중에 루프 붙일때 수정 예정
@@ -76,8 +81,40 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         }
         result = MemeDeployerCrew().crew().kickoff(inputs=inputs)
 
-        print("\n=== Final Meme Token Metadata ===\n")
-        print(result.raw)
+        meta = result.raw
+        if isinstance(meta, str):
+            try:
+                meta = json.loads(meta)
+            except Exception:
+                meta = {"raw": result.raw}
+
+        self.state.token_meta = meta
+        print("\n=== Final Meme Token Metadata (pre-website) ===\n")
+        print(meta)
+
+    # 웹사이트 생성 물어보기 -> 만드는지 안만드는지 bool로 저장
+    @listen(run_meme_deployer)
+    def ask_make_website(self):
+        self.state.make_website = prompt_make_site(
+            "Do you want to create and deploy a website?", default="n"
+        )
+        print(f"🌐 Website generation: {'ON' if self.state.make_website else 'OFF'}")
+
+    # 웹사이트 생성 <- 토큰 메타데이터 받아서 사이트 생성
+    @listen(ask_make_website)
+    def maybe_build_website(self):
+        if not self.state.make_website:
+            print("⚠️ Website generation skipped.")
+            return
+        if not self.state.token_meta:
+            print("⚠️ No token metadata in memory.")
+            return
+
+        os.makedirs("output/moods", exist_ok=True)
+        os.makedirs("output/site/images", exist_ok=True)
+
+        print("🌐 Building & deploying meme token website...")
+        WebsiteDeveloper().crew().kickoff(inputs={"token_meta": self.state.token_meta})
 
 
 def kickoff():
