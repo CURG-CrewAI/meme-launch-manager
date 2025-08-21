@@ -25,7 +25,7 @@ class MemeLaunchBot:
         if not self.bot_token:
             raise ValueError("No TELEGRAM_BOT_TOKEN")
         
-        self.user_states: Dict[int, Dict[str, Any]] = {}
+        self.user_states: Dict[int, Dict[str, Any]] = {} #TODO(@dokin) you must save user states in database it is temporary solution
 
         print("TELEGRAM BOT INITIALIZED")
         
@@ -180,6 +180,7 @@ class MemeLaunchBot:
             
             metadata_text = result.raw
             print(f"Generated metadata: {metadata_text}")
+            self.user_states[user_id]["metadata"] = metadata_text
             
             result_message = (
                 f"🎉 *{keyword} 밈코인 메타 데이터 생성 완료\\!*\n\n"
@@ -188,7 +189,8 @@ class MemeLaunchBot:
             
             keyboard = [
                 [InlineKeyboardButton("🔄 메타 데이터 다시 만들기", callback_data=f"regenerate_metadata_{trend_idx}")],
-                [InlineKeyboardButton("⏭️ 다음 단계로 넘어가기", callback_data=f"generate_website_{trend_idx}")]
+                [InlineKeyboardButton("⏩️ 웹사이트 생성하기", callback_data=f"generate_website_{trend_idx}")],
+                [InlineKeyboardButton("🔀 외부 URL 입력하기", callback_data=f"external_url_{trend_idx}")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -248,7 +250,8 @@ class MemeLaunchBot:
             
             keyboard = [
                 [InlineKeyboardButton("🔄 메타 데이터 다시 만들기", callback_data=f"regenerate_metadata_{trend_idx}")],
-                [InlineKeyboardButton("⏭️ 다음 단계로 넘어가기", callback_data=f"generate_website_{trend_idx}")]
+                [InlineKeyboardButton("⏩️ 웹사이트 생성하기", callback_data=f"generate_website_{trend_idx}")],
+                [InlineKeyboardButton("🔀 외부 URL 입력하기", callback_data=f"external_url_{trend_idx}")]
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -279,7 +282,6 @@ class MemeLaunchBot:
             )
             return
         
-        # Todo generate website with metadata
         await query.edit_message_text(
             f"🏗️ 밈코인 웹사이트 생성 중...\n"
         )
