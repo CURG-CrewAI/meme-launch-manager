@@ -26,3 +26,9 @@ def normalize_numeric(choice_str: str) -> int | None:
         return int(digits)
     except ValueError:
         return None
+
+
+def prompt_make_site(prompt: str, default: str = "n") -> bool:
+    raw = input(f"\n{prompt} (default={default}): ").strip()
+    print(f"[DEBUG] Raw input: {repr(raw)}")
+    return raw.lower() in ("y", "yes")

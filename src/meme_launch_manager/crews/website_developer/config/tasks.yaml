@@ -1,0 +1,124 @@
+extract_token_moods:
+  description: >
+    Primary Input (from context): {token_meta}
+
+    Task:
+      - Use the provided {token_meta} (name, symbol, description) from context
+      - Analyze the description to extract 5–10 diverse mood/style keywords in English
+      - Ensure keywords reflect different style spectrums (energetic vs calm, modern vs retro, minimal vs bold, playful vs elegant)
+      - Save the structured result into 'output/moods/token_mood.json' (for persistence)
+      - Also RETURN the JSON so the next task can use it from context
+
+    Constraints:
+      - Do not produce synonyms or repetitive terms
+      - Do not allow keywords to cluster around a single style axis
+      - Output must be strict JSON object with shape:
+        {"name":..., "symbol":..., "mood_keywords":[...]}
+
+  expected_output: >
+    - Writes 'output/moods/token_mood.json'
+    - Returns {"name","symbol","mood_keywords":[...]} in task output
+
+  output_key: token_mood
+  agent: meme_mood_curator
+
+select_layout_palette:
+  description: >
+    Primary Input (from context): token_mood
+
+    Fallback (only if context missing): read from
+    - 'output/moods/token_mood.json'
+
+    Task:
+      - Read token_mood (keywords or description) from context
+      - Select exactly ONE layout and ONE palette that best match, from the fixed lists below
+      - Save the results into 'output/moods/selected_designs.json' (for persistence)
+      - Also RETURN the JSON array so the next task can use it from context
+
+    Rules:
+      - You must select only from the provided lists (no new names)
+      - Output must be strict JSON array with no extra text, comments, or formatting
+      - For the same input, the selection must remain consistent (deterministic)
+
+    AVAILABLE LAYOUTS:
+      - Floating Island
+      - Split Screen Chaos
+      - Cyber Terminal
+      - Retro Arcade
+      - Minimal Meme
+      - Party Chaos
+      - Galaxy Rise
+      - Brain Spectrum
+      - Victory Rush
+      - Gothic Shadows
+      - Idol Glow
+      - Protest Pulse
+
+    AVAILABLE PALETTES:
+      - Dreamy Pastel
+      - Chaos Pop
+      - Emoji Rainbow
+      - Cyber Hack
+      - Retro Night
+      - Pink Pixel
+      - Soft Minimal
+      - Utility Gray
+      - Default Blue
+      - Galactic Neon
+      - Ancient Scroll
+      - Terminal Dark
+      - Alpha Gains
+      - Speed Blaze
+      - Art Pop
+      - Golden Meme
+      - Gothic Noir
+      - Idol Neon
+
+    Output format (example):
+      [
+        {"name":"YoonAmnestyCoin","symbol":"YAMC","layout":"Left Brain Logic","palette":"Utility Gray"}
+      ]
+
+  expected_output: >
+    - Writes 'output/moods/selected_designs.json'
+    - Returns [{"name","symbol","layout","palette"}] in task output
+
+  output_key: selected_designs
+  agent: design_recommender
+
+build_meme_token_sites:
+  description: >
+    Primary Inputs (from context): selected_designs
+    Fallback (only if context missing): read from
+      - 'output/moods/selected_designs.json'
+
+    Task:
+      - Use the layout & palette specified in selected_designs **exactly as given**
+      - Generate the HTML landing page using TailwindCSS and Google Fonts, applying:
+        - section order
+        - hero alignment
+        - logo position
+        - font style
+        - button style
+        - animation style
+        - color palette (background color, primary/secondary colors, text color)
+      - Save the site to 'output/site/index.html'
+      - Create 'output/site/DESIGN_RATIONALE.md' in Korean including:
+        - name, symbol, mood_keywords
+        - chosen layout & palette (summarized properties)
+        - mapping of mood_keywords ↔ layout/palette (if indirect, explain by semantic similarity)
+        - explanation of why this design fits the community vibe (5–8 sentences, Korean)
+        - 1–2 alternative layout/palette options considered and reasons for rejection (2–4 sentences, Korean)
+      - In index.html, include the logo with:
+        <img src="images/token_image.png" alt="site logo">
+
+    Constraints:
+      - Do NOT re-select or change the layout/palette
+      - HTML must implement: section order, hero alignment, logo position, font style,
+        button style, animation style, and palette colors exactly
+
+  expected_output: >
+    1) A styled landing page at 'output/site/index.html'
+    2) A Korean rationale document at 'output/site/DESIGN_RATIONALE.md'
+
+  agent: meme_token_site_designer
