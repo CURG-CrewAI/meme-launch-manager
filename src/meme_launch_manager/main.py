@@ -16,6 +16,7 @@ from meme_launch_manager.crews.website_developer.website_developer import (
     WebsiteDeveloper,
 )
 
+from utils.metadata_manager import print_metadata
 from utils.trends_io import load_trends_from_file, parse_raw_trends
 from utils.cli import format_trends, prompt_choice, normalize_numeric, prompt_make_site
 from utils.selection import validate_choice, pick_trend
@@ -91,8 +92,8 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
                 meta = {"raw": result.raw}
 
         self.state.token_meta = meta
-        print("\n=== Final Meme Token Metadata (pre-website) ===\n")
-        print(meta)
+        print("\n=== Basic Meme Token Metadata ===\n")
+        print_metadata("output/metadata.json")
 
     # 웹사이트 생성 물어보기 -> 만드는지 안만드는지 bool로 저장
     @listen(run_meme_data_generator)
@@ -117,6 +118,8 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
         print("🌐 Building & deploying meme token website...")
         WebsiteDeveloper().crew().kickoff(inputs={"token_meta": self.state.token_meta})
+        print("\n=== Advanced Meme Token Metadata ===\n")
+        print_metadata("output/metadata.json")
 
 
 def kickoff():

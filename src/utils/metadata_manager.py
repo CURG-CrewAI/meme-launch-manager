@@ -5,9 +5,9 @@ from pathlib import Path
 def add_metadata(file_path: str, key: str, value: str) -> None:
     """
     Args:
-        file_path (str): JSON 파일 경로
-        key (str): 추가할 키
-        value (str): 추가할 값
+        file_path (str): JSON file path
+        key (str): key to add
+        value (str): value to add
     """
 
     path = Path(file_path)
@@ -31,7 +31,7 @@ def add_metadata(file_path: str, key: str, value: str) -> None:
 
 def print_metadata(file_path: str) -> None:
     """
-    metadata.json 파일 내용을 터미널에 출력합니다.
+    Print metadata.json
     """
     path = Path(file_path)
 
