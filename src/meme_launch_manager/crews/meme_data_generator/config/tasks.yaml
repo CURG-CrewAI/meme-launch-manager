@@ -217,8 +217,9 @@ convert_json:
     2. format the JSON exactly
     3. keep special characters or emojis, but process them so that they don't cause problems in the JSON
     4. categorize and lay out the content of each section correctly
+    5. save metadata.json in output/
   expected_output: >
-    JSON data
+    JSON data and JSON file
   agent: json_converter
   context:
     - write_satire

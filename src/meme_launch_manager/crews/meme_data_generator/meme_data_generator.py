@@ -9,6 +9,9 @@ from crewai_tools import SerperDevTool, ScrapeWebsiteTool
 dalle_tool = DallETool(model="dall-e-3", size="1024x1024", quality="standard", n=1)
 serper_tool = SerperDevTool()
 scrape_tool = ScrapeWebsiteTool()
+metadata_writer_tool = FileWriterTool(
+    file_name="metadata.json", directory="output", overwrite=True
+)
 
 gemini_pro = LLM(model="gemini/gemini-2.5-pro")
 gemini_flash = LLM(model="gemini/gemini-2.5-flash")
@@ -68,6 +71,7 @@ class MemeDataGeneratorCrew:
             config=self.agents_config["json_converter"],
             verbose=True,
             llm=gemini_flash,
+            tools=[metadata_writer_tool],
         )
 
     # @agent

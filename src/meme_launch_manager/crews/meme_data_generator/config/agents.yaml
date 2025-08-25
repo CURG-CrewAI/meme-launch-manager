@@ -69,7 +69,7 @@ json_converter:
   role: >
     JSON converter
   goal: >
-    Convert satirical articles into JSON format
+    Convert satirical articles into JSON format and save JSON file
   backstory: >
     You are an expert in converting various data into a structured JSON format.
 
