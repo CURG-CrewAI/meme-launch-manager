@@ -150,4 +150,4 @@ def deploy_sites_under(
         print(f"📝 JSON report saved to `{report_path}`")
     else:
         print("\n⚠️ No deployments were successful.")
-    return deployed
+    return url

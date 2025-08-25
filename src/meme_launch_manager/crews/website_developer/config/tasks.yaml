@@ -22,6 +22,68 @@ extract_token_moods:
   output_key: token_mood
   agent: meme_mood_curator
 
+write_website_contents:
+  description: >
+    Create a tokeonomics and roadmap based on the {token_meta}.
+
+    Your most important task is to maintain consistency.
+    The `✨Features` items presented in {token_meta}, **must** be taken and elaborated on in the `Special Features` section of `TOKENOMICS` that you will write.** Never ignore those ideas and create new mechanisms.
+
+    💡 **Workflow Guide (Your Workflow):** 1.
+    1. carefully read the `✨ Features` section of the satire you received as {token_meta}.
+    2. Use the names of the features as the title of the `Special Features` section of `TOKENOMICS` that you will write.
+    3. Be creative and fun in explaining how each feature works specifically from a Tokenomics perspective (e.g., staking, burning, rewards, etc.).
+    4. If you want to add a new mechanic that wasn't in the satire (e.g. general burning), it's okay to do so **after** you've described all the existing features.
+
+
+    📊 tokenomics requirements:
+    1. Total Supply: A ridiculous number (e.g. 420.69 trillion)
+    2. Distribution:
+    - Team: X% (with a ridiculous reason)
+    - Marketing: X% (with a ridiculous marketing plan)
+    - Liquidity: X 
+    - Community: X% (with ridiculous community benefits)
+    3. Special Features:
+    **(required) Specifically describe ideas taken from the `✨Features` in the satire article**.
+        
+    🗺️ ROADMAP Requirements:
+    Q1 2025: [Goal that sounds like a lie, but is slightly realistic]
+    Q2 2025: [Goal that sounds so ridiculous it's almost impossible]
+    Q3 2025: [Completely impossible goal that violates the laws of physics]
+    Q4 2025: [Space conquest/time travel level goal].
+        
+    Format:
+    📊 TOKENOMICS
+    ================
+    Total Supply: [Number].
+        
+    Distribution:
+    - Team: X% - [funny description].
+    - Marketing: X% - [ridiculous plan]
+    - Liquidity: X% - [Exaggerated explanation].
+    - Community: X% - [Ridiculous benefits].
+
+    Special Features:
+    - [Specifically describe ideas taken from the satire's `✨ Features`]
+    - [Specifically describe ideas taken from the satirical `✨ Features`]
+    - [Specifically describe the ideas taken from the `✨ Features` in the satire]]
+
+    🗺️ ROADMAP TO THE MOON (AND BEYOND)
+    =====================================
+    Q1 2025: [goals]
+    Q2 2025: [goals]
+    Q3 2025: [goals]
+    Q4 2025: [goals]
+
+    ⚠️ Important: Write everything in English, be funny with a serious tone, and write in a similar style to the satire created in the previous step.
+                  Pretend this is an official whitepaper presented to serious investors, but the content is absurd. Never break character. 
+                  Have to write 'output/site/website_contents.txt'
+
+  expected_output: >
+    A complete report including talkonomics and roadmaps
+    Writes 'output/site/website_contents.txt'
+  agent: website_contents_writer
+
 select_layout_palette:
   description: >
     Primary Input (from context): token_mood
@@ -85,12 +147,12 @@ select_layout_palette:
 
   output_key: selected_designs
   agent: design_recommender
+  context:
+    - extract_token_moods
 
 build_meme_token_sites:
   description: >
-    Primary Inputs (from context): selected_designs
-    Fallback (only if context missing): read from
-      - 'output/moods/selected_designs.json'
+    Primary Inputs (from context): select_layout_palette , write_website_contents
 
     Task:
       - Use the layout & palette specified in selected_designs **exactly as given**
@@ -122,3 +184,6 @@ build_meme_token_sites:
     2) A Korean rationale document at 'output/site/DESIGN_RATIONALE.md'
 
   agent: meme_token_site_designer
+  context:
+    - select_layout_palette
+    - write_website_contents
