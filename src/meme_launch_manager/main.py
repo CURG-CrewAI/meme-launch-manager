@@ -9,7 +9,9 @@ from crewai.flow import Flow, listen, start
 from meme_launch_manager.crews.trending_scraper.trending_scraper import (
     TrendingScraperCrew,
 )
-from meme_launch_manager.crews.meme_deployer.meme_deployer import MemeDeployerCrew
+from meme_launch_manager.crews.meme_data_generator.meme_data_generator import (
+    MemeDataGeneratorCrew,
+)
 from meme_launch_manager.crews.website_developer.website_developer import (
     WebsiteDeveloper,
 )
@@ -69,7 +71,7 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
     # 플로우스테이트에서 선택된 트렌드 확인후 밈토큰 메타데이터및 이미지 생성
     @listen(display_result)
-    def run_meme_deployer(self):
+    def run_meme_data_generator(self):
         trend = self.state.selected_trend
         if not trend:
             print("⚠️ No trend selected")
@@ -79,7 +81,7 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
             "keyword": trend["keyword"],
             "why_trending": trend["why_trending"],
         }
-        result = MemeDeployerCrew().crew().kickoff(inputs=inputs)
+        result = MemeDataGeneratorCrew().crew().kickoff(inputs=inputs)
 
         meta = result.raw
         if isinstance(meta, str):
@@ -93,7 +95,7 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         print(meta)
 
     # 웹사이트 생성 물어보기 -> 만드는지 안만드는지 bool로 저장
-    @listen(run_meme_deployer)
+    @listen(run_meme_data_generator)
     def ask_make_website(self):
         self.state.make_website = prompt_make_site(
             "Do you want to create and deploy a website?", default="n"
