@@ -26,6 +26,10 @@ CLOUDFLARE_ACCOUNT_ID=
 ```
 
 Enter the command below to run it
+* Before you run it, you must install wrangler
+  ```
+  $ npm install -g wrangler
+  ```
 
 ```bash
 crewai flow kickoff
