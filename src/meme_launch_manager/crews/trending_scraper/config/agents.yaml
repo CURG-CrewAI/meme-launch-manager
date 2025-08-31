@@ -56,7 +56,7 @@ trend_explainer:
   role: >
     Real-Time Trend Investigator
   goal: >
-    To receive a JSON list of trending keywords, perform real-time web research for each keyword,
+    To receive a JSON list of trending keywords, perform real-time web research for each keyword (using serper search tool),
     and return a JSON array of objects with "keyword" and "why_trending".
     Save the trends JSON to `output/trending_scraper/trends.json`.
   backstory: >

@@ -5,10 +5,12 @@ import os
 import shutil
 from typing import List
 
+
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, after_kickoff
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import FileWriterTool, FileReadTool
+from utils.metadata_manager import add_metadata
 
 from utils.deploy_website import deploy_sites_under
 
@@ -20,6 +22,9 @@ site_writer_tool = FileWriterTool(
 )
 mood_writer_tool = FileWriterTool(
     file_name="token_mood.json", directory="output/moods", overwrite=True
+)
+website_contents_writer_tool = FileWriterTool(
+    file_name="website_contents.txt", directory="output/site", overwrite=True
 )
 selected_design_writer_tool = FileWriterTool(
     file_name="selected_designs.json", directory="output/moods", overwrite=True
@@ -54,18 +59,28 @@ class WebsiteDeveloper:
             self._copy_token_image()
         except Exception as e:
             print(f"⚠️ Image copy failed: {e}")
-        deploy_sites_under(
+        url=deploy_sites_under(
             sites_dir=sites_dir,
             image_copier=None,
             branch="main",
             report_path="output/deployment.json",
         )
+        add_metadata("output/metadata.json", "Website", url)
+
+        
 
     @agent
     def meme_mood_curator(self) -> Agent:
         return Agent(
             config=self.agents_config["meme_mood_curator"],
             tools=[mood_writer_tool],
+        )
+
+    @agent
+    def website_contents_writer(self) -> Agent:
+        return Agent(
+            config=self.agents_config["website_contents_writer"],
+            tools=[website_contents_writer_tool],
         )
 
     @agent
@@ -94,6 +109,10 @@ class WebsiteDeveloper:
     @task
     def extract_token_moods(self) -> Task:
         return Task(config=self.tasks_config["extract_token_moods"])
+
+    @task
+    def write_website_contents(self) -> Task:
+        return Task(config=self.tasks_config["write_website_contents"])
 
     @task
     def select_layout_palette(self) -> Task:

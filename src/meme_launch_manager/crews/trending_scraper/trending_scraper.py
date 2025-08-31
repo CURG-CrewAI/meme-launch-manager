@@ -7,7 +7,7 @@ sys.path.append(BASE_DIR)
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import FileWriterTool, SeleniumScrapingTool
-from crewai_tools.tools.tavily_search_tool.tavily_search_tool import TavilySearchTool
+from crewai_tools import SerperDevTool
 
 # === Scraping tools ===
 namunews_scraping_tool = SeleniumScrapingTool(
@@ -33,7 +33,7 @@ trends_writer_tool = FileWriterTool(
     file_name="trends.json", directory="output", overwrite=True
 )
 
-tavily_tool = TavilySearchTool()
+serper_tool = SerperDevTool()
 
 
 @CrewBase
@@ -86,7 +86,7 @@ class TrendingScraperCrew:
     def trend_explainer(self) -> Agent:
         return Agent(
             config=self.agents_config["trend_explainer"],
-            tools=[trends_writer_tool, tavily_tool],
+            tools=[trends_writer_tool, serper_tool],
         )
 
     # === Tasks ===

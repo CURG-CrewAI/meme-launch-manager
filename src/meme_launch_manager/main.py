@@ -9,11 +9,14 @@ from crewai.flow import Flow, listen, start
 from meme_launch_manager.crews.trending_scraper.trending_scraper import (
     TrendingScraperCrew,
 )
-from meme_launch_manager.crews.meme_deployer.meme_deployer import MemeDeployerCrew
+from meme_launch_manager.crews.meme_data_generator.meme_data_generator import (
+    MemeDataGeneratorCrew,
+)
 from meme_launch_manager.crews.website_developer.website_developer import (
     WebsiteDeveloper,
 )
 
+from utils.metadata_manager import print_metadata
 from utils.trends_io import load_trends_from_file, parse_raw_trends
 from utils.cli import format_trends, prompt_choice, normalize_numeric, prompt_make_site
 from utils.selection import validate_choice, pick_trend
@@ -69,7 +72,7 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
     # 플로우스테이트에서 선택된 트렌드 확인후 밈토큰 메타데이터및 이미지 생성
     @listen(display_result)
-    def run_meme_deployer(self):
+    def run_meme_data_generator(self):
         trend = self.state.selected_trend
         if not trend:
             print("⚠️ No trend selected")
@@ -79,7 +82,7 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
             "keyword": trend["keyword"],
             "why_trending": trend["why_trending"],
         }
-        result = MemeDeployerCrew().crew().kickoff(inputs=inputs)
+        result = MemeDataGeneratorCrew().crew().kickoff(inputs=inputs)
 
         meta = result.raw
         if isinstance(meta, str):
@@ -89,11 +92,11 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
                 meta = {"raw": result.raw}
 
         self.state.token_meta = meta
-        print("\n=== Final Meme Token Metadata (pre-website) ===\n")
-        print(meta)
+        print("\n=== Basic Meme Token Metadata ===\n")
+        print_metadata("output/metadata.json")
 
     # 웹사이트 생성 물어보기 -> 만드는지 안만드는지 bool로 저장
-    @listen(run_meme_deployer)
+    @listen(run_meme_data_generator)
     def ask_make_website(self):
         self.state.make_website = prompt_make_site(
             "Do you want to create and deploy a website?", default="n"
@@ -115,6 +118,8 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
         print("🌐 Building & deploying meme token website...")
         WebsiteDeveloper().crew().kickoff(inputs={"token_meta": self.state.token_meta})
+        print("\n=== Advanced Meme Token Metadata ===\n")
+        print_metadata("output/metadata.json")
 
 
 def kickoff():
