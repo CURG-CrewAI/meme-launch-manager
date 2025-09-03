@@ -19,12 +19,12 @@ class OrganizedTrends(BaseModel):
     google: List[str]
 
 
-# class FinalTop5(BaseModel):
-#     items: List[Dict[str, str]]
+class FinalTop5(BaseModel):
+    finalTop5: List[Dict[str, str]]
 
 
-# class ExplainedTrends(BaseModel):
-#     items: List[Dict[str, str]]
+class TrendsWithWhy(BaseModel):
+    trendsWithWhy: List[Dict[str, str]]
 
 
 # === Scraping tools ===
@@ -73,7 +73,6 @@ class TrendingScraperCrew:
         max_iter=2,
         max_rpm=10,
     )
-
 
     @agent
     def namunews_trending_scraper(self) -> Agent:
@@ -163,7 +162,7 @@ class TrendingScraperCrew:
                 self.collect_x_trending(),
                 self.collect_google_trending(),
             ],
-            output_pydantic=OrganizedTrends,
+            output_json=OrganizedTrends,
         )
 
     @task
@@ -171,7 +170,7 @@ class TrendingScraperCrew:
         return Task(
             config=self.tasks_config["cross_validate_trending"],
             context=[self.organize_trending()],
-            # output_pydantic=FinalTop5,
+            output_json=FinalTop5,
         )
 
     @task
@@ -179,7 +178,7 @@ class TrendingScraperCrew:
         return Task(
             config=self.tasks_config["explain_trends"],
             context=[self.cross_validate_trending()],
-            # output_pydantic=ExplainedTrends,
+            output_json=TrendsWithWhy,
         )
 
     @crew

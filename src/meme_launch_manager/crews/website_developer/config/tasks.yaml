@@ -18,8 +18,6 @@ extract_token_moods:
   expected_output: >
     - Writes 'output/moods/token_mood.json'
     - Returns {"name","symbol","mood_keywords":[...]} in task output
-
-  output_key: token_mood
   agent: meme_mood_curator
 
 write_website_contents:

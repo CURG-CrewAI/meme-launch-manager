@@ -56,19 +56,29 @@ organize_trending:
     and the value should be an array of keywords in order of ranking.
     Save this combined object to `output/trending_scraper/scrapped_site.json` and also return it as context for the next task.
   expected_output: >
-    A JSON object structured as:
+    Your response MUST be valid JSON, like this:
     {
-      "namunews": ["정우성", "시드니", "안우진", ...],
-      "x": ["안우진", "정우성", "손흥민", ...],
-      "google": ["정우성", "민생지원금", "손흥민", ...],
-      "signal": ["시드니", "손흥민", "정우성", ...]
+      "namunews": [<list of strings>],
+      "x": [<list of strings>],
+      "google": [<list of strings>],
+      "signal": [<list of strings>]
     }
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
+
   agent: trending_organizer
 
 cross_validate_trending:
   description: >
-    Analyze the `organize_trending` output from context (keyword arrays from each service:
-    Namunews, X, Google, Signal).
+    You will receive a JSON object from the previous task (organize_trending), which contains four lists of trending keywords
+    from different platforms
+
+    The input will look like this:
+    {
+      "namunews": [<list of strings>],
+      "signal": [<list of strings>],
+      "x": [<list of strings>],
+      "google": [<list of strings>]
+    }
 
     Goals:
     1) Identify the **Top 5 keywords** that appear most frequently across multiple services.
@@ -109,27 +119,46 @@ cross_validate_trending:
       in order of appearance, until there are exactly 5 items.
 
     Output:
-    - Do not save to a file. Return a JSON array of exactly 5 objects,
+    - Do not save to a file. Return a JSON of exactly 5 objects,
       each in the form {"keyword": "<representative>"}.
 
   expected_output: >
-    A JSON object structured as:
-    [
-      {"keyword": "정우성"},
-      {"keyword": "안우진"},
-      {"keyword": "시드니"},
-      {"keyword": "손흥민"},
-      {"keyword": "민생지원금"}
-    ]
+    Your response MUST be valid JSON, wrapped in a top-level key called "finalTop5", like this:
+      {
+        "finalTop5": [
+          {"keyword": "정우성"},
+          {"keyword": "안우진"},
+          {"keyword": "시드니"},
+          {"keyword": "손흥민"},
+          {"keyword": "민생지원금"}
+        ]
+      }
+
+    Do not include any markdown, explanations, or extra keys.
 
   agent: cross_validation_agent
 
 explain_trends:
   description: >
-    Receive the top 5 trending keywords as context (output of `cross_validate_trending`).
-    Perform real-time web research for each keyword and return a JSON array where each item is an object containing:
-      - "keyword": the keyword string
-      - "why_trending": a concise but informative explanation in English
+    You will receive a list of 5 trending keywords via the context variable `cross_validate_trending`.
+    These keywords represent the most prominent current trends in Korea.
+
+    The input will look like this:
+    {
+      "finalTop5": [
+        {"keyword": "정우성"},
+        {"keyword": "안우진"},
+        {"keyword": "시드니"},
+        {"keyword": "손흥민"},
+        {"keyword": "민생지원금"}
+      ]
+    }
+
+    Goals:
+      Perform real-time web research for each keyword and return a JSON where each item is an object containing:
+        - "keyword": the keyword string
+        - "why_trending": a concise but informative explanation in English
+
 
     Requirements for "why_trending":
     - Should be about 2 sentences long (roughly two lines of text).
@@ -139,32 +168,38 @@ explain_trends:
     - Avoid vague phrasing ("caused issues", "sparked debate") without specifics.
     - Do not exceed 3 sentences.
 
-    Save the JSON array to `output/trending_scraper/trends.json` (overwrite if exists).
-    Return exactly the same JSON array as the final output.
+    Save the JSON to `output/trending_scraper/trends.json` (overwrite if exists).
+    Return exactly the same list of dictionaries as the final output.
 
   expected_output: >
-    A JSON object structured as:
-    [
-      {
-        "keyword": "정우성",
-        "why_trending": "Actor Jung Woo-sung is making headlines due to recent marriage rumors with a fellow celebrity. The speculation has been widely covered by entertainment outlets, drawing significant attention from fans and the public."
-      },
-      {
-        "keyword": "안우진",
-        "why_trending": "Baseball pitcher Ahn Woo-jin is trending after reports revealed a shoulder injury sustained during military service. The news has raised concerns about his future performance and impact on his team."
-      },
-      {
-        "keyword": "시드니",
-        "why_trending": "Sydney became a hot topic after controversy erupted over a new advertising slogan linked to the city. Public debate around cultural sensitivity and branding has fueled the discussion online."
-      },
-      {
-        "keyword": "손흥민",
-        "why_trending": "Soccer star Son Heung-min is praised for his outstanding recent performance in international matches. His leadership and candid post-match interviews have resonated strongly with fans worldwide."
-      },
-      {
-        "keyword": "민생지원금",
-        "why_trending": "The South Korean government announced a new round of financial aid aimed at supporting citizens during economic hardships. The policy has sparked nationwide discussion on eligibility and its potential economic impact."
-      }
-    ]
+    You must return a list of 5 dictionaries under a top-level key called "trendsWithWhy".
+    Each dictionary must contain:
+    {
+      "trendsWithWhy": [
+        {
+          "keyword": "정우성",
+          "why_trending": "Actor Jung Woo-sung is making headlines due to recent marriage rumors with a fellow celebrity. The speculation has been widely covered by entertainment outlets, drawing significant attention from fans and the public."
+        },
+        {
+          "keyword": "안우진",
+          "why_trending": "Baseball pitcher Ahn Woo-jin is trending after reports revealed a shoulder injury sustained during military service. The news has raised concerns about his future performance and impact on his team."
+        },
+        {
+          "keyword": "시드니",
+          "why_trending": "Sydney became a hot topic after controversy erupted over a new advertising slogan linked to the city. Public debate around cultural sensitivity and branding has fueled the discussion online."
+        },
+        {
+          "keyword": "손흥민",
+          "why_trending": "Soccer star Son Heung-min is praised for his outstanding recent performance in international matches. His leadership and candid post-match interviews have resonated strongly with fans worldwide."
+        },
+        {
+          "keyword": "민생지원금",
+          "why_trending": "The South Korean government announced a new round of financial aid aimed at supporting citizens during economic hardships. The policy has sparked nationwide discussion on eligibility and its potential economic impact."
+        }
+      ]
+    }
+      
+
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
 
   agent: trend_explainer
