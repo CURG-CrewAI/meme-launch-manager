@@ -1,14 +1,3 @@
-# token_meta_generator:
-#   role: >
-#     Meme Token Metadata Generator
-#   goal: >
-#     Generate creative and meme-worthy token data (name, symbol, description) for the trend "{keyword}".
-#     Reason: "{why_trending}".
-#     Use this data to create unique, catchy meme token metadata.
-#   backstory: >
-#     Expert in internet culture, memes, and viral trends, capable of turning any trending topic into a funny and relevant meme coin idea.
-#     It specializes in generating catchy names, memorable symbols, and humorous or symbolic descriptions that capture the spirit of the trend.
-
 news_url_collector:
   role: >
     Korean News Search Expert

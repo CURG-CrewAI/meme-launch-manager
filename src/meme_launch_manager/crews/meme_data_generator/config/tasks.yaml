@@ -1,19 +1,3 @@
-# generate_token_metadata:
-#   description: >
-#     Given the trend "{keyword}" and reason "{why_trending}", create meme token metadata.
-#     This includes a creative name, an all-uppercase symbol (3–6 letters), and a brief, witty description
-#     connecting the trend to meme culture.
-#     The name should be catchy or playful, and the description should highlight why this token exists.
-#     Return the result as a JSON object in context for the next task without saving it to a file.
-#   expected_output: >
-#     A JSON object with the following structure:
-#     {
-#       "name": "<Token Name>",
-#       "symbol": "<SYMBOL>",
-#       "description": "<Witty, concise token description>"
-#     }
-#   agent: token_meta_generator
-
 collect_news_url:
   description: >
     Based on the given keyword '{keyword}' and the reason it is trending '{why_trending}', you need to find the most accurate and relevant latest Korean news articles.
@@ -26,7 +10,30 @@ collect_news_url:
 
     Using these strategies together, find 3–5 reliable and up-to-date articles. Collect the title, URL, and a short summary for each.
 
-    The result must be structured in the following JSON format:
+    Output : a JSON-formatted string containing information on 5 to 7 reliable, recent articles.
+
+  expected_output: >
+    Your response MUST be valid JSON, like this:
+    {
+      "keyword": "{keyword}",
+      "articles": [
+          {
+              "title": "Article Title",
+              "url": "Article URL",
+              "snippet": "Article summary",
+              "source": "News outlet"
+          }
+      ]
+    }
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
+
+  agent: news_url_collector
+
+extract_main_article:
+  description: >
+    You will receive a JSON object from the previous task (collect_news_url), which contains article URLs
+
+    The input will look like this:
       {
         "keyword": "{keyword}",
         "articles": [
@@ -37,14 +44,9 @@ collect_news_url:
                 "source": "News outlet"
             }
         ]
-    }
-  expected_output: >
-    A JSON-formatted string containing information on 5 to 7 reliable, recent articles.
-  agent: news_url_collector
+      }
 
-extract_main_article:
-  description: >
-    From the previously collected article URLs, extract the main article content.
+    Goal : extract the main article content.
 
     Extraction requirements:
       1.	Access each URL and extract the article body.
@@ -53,7 +55,9 @@ extract_main_article:
       4.	Summarize only the essential facts and contextual information.
       5.	Clearly identify the background of the issue and the current situation.
 
-    Format the results as follows:
+    Output : Extracted article texts in JSON format
+  expected_output: >
+    Your response MUST be valid JSON, like this:
       {
           "extracted_content": [
               {
@@ -64,12 +68,9 @@ extract_main_article:
               }
           ]
       }
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
 
-  expected_output: >
-    Extracted article texts in JSON format
   agent: article_extractor
-  context:
-    - collect_news_url
 
 write_satire:
   description: >
@@ -136,81 +137,10 @@ write_satire:
   expected_output: >
     Completed English meme coin satire
   agent: satirist
-  context:
-    - extract_main_article
-
-# write_website_contents:
-#   description: >
-#     '{keyword}' generated in the previous step (context) Create a talkonomics and roadmap based on the memecoin satire.
-
-#     Your most important task is to maintain consistency.
-#     The `✨Features` items presented in the introduction of the satire, **must** be taken and elaborated on in the `Special Features` section of `TOKENOMICS` that you will write.** Never ignore those ideas and create new mechanisms.
-
-#     💡 **Workflow Guide (Your Workflow):** 1.
-#     1. carefully read the `✨ Features` section of the satire you received as context.
-#     2. Use the names of the features as the title of the `Special Features` section of `TOKENOMICS` that you will write.
-#     3. Be creative and fun in explaining how each feature works specifically from a Tokenomics perspective (e.g., staking, burning, rewards, etc.).
-#     4. If you want to add a new mechanic that wasn't in the satire (e.g. general burning), it's okay to do so **after** you've described all the existing features.
-
-
-#     📊 tokenomics requirements:
-#     1. Total Supply: A ridiculous number (e.g. 420.69 trillion)
-#     2. Distribution:
-#     - Team: X% (with a ridiculous reason)
-#     - Marketing: X% (with a ridiculous marketing plan)
-#     - Liquidity: X 
-#     - Community: X% (with ridiculous community benefits)
-#     3. Special Features:
-#     **(required) Specifically describe ideas taken from the `✨Features` in the satire article**.
-        
-#     🗺️ ROADMAP Requirements:
-#     Q1 2025: [Goal that sounds like a lie, but is slightly realistic]
-#     Q2 2025: [Goal that sounds so ridiculous it's almost impossible]
-#     Q3 2025: [Completely impossible goal that violates the laws of physics]
-#     Q4 2025: [Space conquest/time travel level goal].
-        
-#     Format:
-#     📊 TOKENOMICS
-#     ================
-#     Total Supply: [Number].
-        
-#     Distribution:
-#     - Team: X% - [funny description].
-#     - Marketing: X% - [ridiculous plan]
-#     - Liquidity: X% - [Exaggerated explanation].
-#     - Community: X% - [Ridiculous benefits].
-
-#     Special Features:
-#     - [Specifically describe ideas taken from the satire's `✨ Features`]
-#     - [Specifically describe ideas taken from the satirical `✨ Features`]
-#     - [Specifically describe the ideas taken from the `✨ Features` in the satire]]
-
-#     🗺️ ROADMAP TO THE MOON (AND BEYOND)
-#     =====================================
-#     Q1 2025: [goals]
-#     Q2 2025: [goals]
-#     Q3 2025: [goals]
-#     Q4 2025: [goals]
-
-#     ⚠️ Write everything in English, be funny with a serious tone, and write in a similar style to the satire created in the previous step.
-#     Pretend this is an official whitepaper presented to serious investors, but the content is absurd. Never break character.
-#   expected_output: >
-#     A complete report including talkonomics and roadmaps
-#   agent: website_contents_writer
 
 convert_json:
   description: >
     Convert all the information generated in the previous step (satire) into a JSON format
-
-    JSON structure requirements:
-    {
-      "name": "Memecoin full name",
-      "symbol": "Memecoin ticker",
-      "description": "Body description",
-      "features": ["feature1", "feature2", "feature3"],
-      "warning": "Investment warning",
-      "hashtags": ["hashtag1", "hashtag2", "hashtag3"],
-    }
 
     Notes:
     1. keep all text in English
@@ -219,10 +149,18 @@ convert_json:
     4. categorize and lay out the content of each section correctly
     5. save metadata.json in output/
   expected_output: >
-    JSON data and JSON file
+    Your response MUST be valid JSON, like this:
+      {
+        "name": "Memecoin full name",
+        "symbol": "Memecoin ticker",
+        "description": "Body description",
+        "features": ["feature1", "feature2", "feature3"],
+        "warning": "Investment warning",
+        "hashtags": ["hashtag1", "hashtag2", "hashtag3"],
+      }
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
+
   agent: json_converter
-  context:
-    - write_satire
 # generate_image_prompt:
 #   description: >
 #     Given the trend "{keyword}" and reason "{why_trending}", write a vivid and specific image generation prompt suitable for DALL·E, Midjourney, or other visual AI models.
