@@ -1,0 +1,26 @@
+# Core
+python-telegram-bot==20.7
+python-dotenv==1.0.0
+
+# Storage & Cache
+redis==5.0.1
+httpx==0.25.2
+boto3==1.34.11
+
+# CrewAI & AI
+crewai==0.1.0
+crewai-tools==0.1.0
+langchain==0.1.0
+openai==1.6.1
+
+# Web Scraping
+beautifulsoup4==4.12.2
+requests==2.31.0
+
+# Async
+asyncio==3.4.3
+aiohttp==3.9.1
+
+# Utils
+pydantic==2.5.3
+python-json-logger==2.0.7
