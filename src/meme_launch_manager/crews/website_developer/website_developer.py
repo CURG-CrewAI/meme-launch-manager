@@ -1,18 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import annotations
 
-import os
-import shutil
 from typing import List
-
-
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task, after_kickoff
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import FileWriterTool, FileReadTool
-from utils.metadata_manager import add_metadata
-
-from utils.deploy_website import deploy_sites_under
+from utils.website_helper import deploy_site
 
 layouts_cfg_reader_tool = FileReadTool(file_path="templates/layouts.json")
 palettes_cfg_reader_tool = FileReadTool(file_path="templates/palettes.json")
@@ -41,33 +35,11 @@ class WebsiteDeveloper:
     agents: List[BaseAgent]
     tasks: List[Task]
 
-    def _copy_token_image(self, symbol: str = "") -> None:
-        src = "output/images/token_image.png"
-        dst_dir = f"output/site/images"
-        if os.path.exists(src):
-            os.makedirs(dst_dir, exist_ok=True)
-            shutil.copy(src, dst_dir)
-            print(f"🖼 Copied token_image.png → {dst_dir}")
-        else:
-            print(f"⚠️ Token image not found at {src}")
-
     @after_kickoff
-    def deploy_to_cloudflare_pages(self, output) -> None:
-        sites_dir = "output/site"
-        try:
-            os.makedirs(os.path.join(sites_dir, "images"), exist_ok=True)
-            self._copy_token_image()
-        except Exception as e:
-            print(f"⚠️ Image copy failed: {e}")
-        url=deploy_sites_under(
-            sites_dir=sites_dir,
-            image_copier=None,
-            branch="main",
-            report_path="output/deployment.json",
-        )
-        add_metadata("output/metadata.json", "Website", url)
-
-        
+    def deploy_page(self, output) -> None:
+        site_dir = "output/site"
+        url = deploy_site(site_dir, "main")
+        return url
 
     @agent
     def meme_mood_curator(self) -> Agent:

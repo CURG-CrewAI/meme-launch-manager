@@ -2,9 +2,11 @@
 from __future__ import annotations
 import json
 import os
+from turtle import update
 
 from pydantic import BaseModel, Field
-from crewai.flow import Flow, listen, persist, router, start
+from crewai.flow import Flow, listen, or_, persist, router, start
+from utils.metadata_helper import update_metadata
 
 from meme_launch_manager.crews.trending_scraper.trending_scraper import (
     TrendingScraperCrew,
@@ -16,21 +18,25 @@ from meme_launch_manager.crews.website_developer.website_developer import (
     WebsiteDeveloper,
 )
 
-from utils.metadata_manager import print_metadata
-from utils.trends_io import load_trends_from_file, parse_raw_trends
-from utils.cli import print_trends, prompt_choice_trend, prompt_make_site
+from utils.metadata_helper import print_metadata
+from utils.cli import (
+    print_trends,
+    prompt_choice_trend,
+    prompt_make_site,
+    prompt_telegram_url,
+    prompt_x_url,
+)
 
 
-# 플로우 스테이트 (트렌드 스크래핑해온 5개 저장 및 선택한 트렌드 저장 and 웹사이트 생성 찬반, 토큰메타데이터 저장)
 class MemeLaunchFlowState(BaseModel):
     top_trends: dict | None = None
     selected_trend: dict | None = None
     token_metadata: dict | None = None
     website_flag: bool = False
+    website_url: str = False
 
 
 class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
-    @persist()
     @start()
     def run_trending_scraper(self):
         print("👀 Looking for trends in South Korea...")
@@ -38,46 +44,53 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         print_trends(top_trends["trendsWithWhy"])
         self.state.top_trends = top_trends
 
-    @persist()
     @listen(run_trending_scraper)
     def select_trend(self):
         top_trends = self.state.top_trends["trendsWithWhy"]
         self.state.selected_trend = prompt_choice_trend(top_trends, 1)
-        print(f"{self.state.selected_trend}")
 
-    @persist()
     @listen(select_trend)
     def run_meme_data_generator(self):
         selected_trend = self.state.selected_trend
         token_metadata = MemeDataGeneratorCrew().crew().kickoff(inputs=selected_trend)
         self.state.token_metadata = token_metadata
-        print(f"🚗 {self.state.token_metadata}")
 
-    # @router(run_meme_data_generator)
-    # def ask_make_website(self):
-    #     self.state.website_flag = prompt_make_site(
-    #         "Do you want to create and deploy a website?", default="n"
-    #     )
-    #     if self.state.website_flag:
-    #         return "yes"
-    #     else:
-    #         return "no"
+    @router(run_meme_data_generator)
+    def ask_make_website(self):
+        self.state.website_flag = prompt_make_site("n")
+        if self.state.website_flag:
+            return "Generated"
+        else:
+            return "Not created"
 
-    # @listen("yes")
-    # def maybe_build_website(self):
-    #     os.makedirs("output/moods", exist_ok=True)
-    #     os.makedirs("output/site/images", exist_ok=True)
+    @listen("Generated")
+    def run_website_developer(self):
+        token_metadata = self.state.token_metadata["memeTokenMetaData"]
+        self.state.website_url = (
+            WebsiteDeveloper().crew().kickoff(inputs={"token_metadata": token_metadata})
+        )
 
-    #     print("🌐 Building & deploying meme token website...")
-    #     WebsiteDeveloper().crew().kickoff(inputs={"token_meta": self.state.token_meta})
-    #     print("\n=== Advanced Meme Token Metadata ===\n")
-    #     print_metadata("output/metadata.json")
+    @listen(run_website_developer)
+    def update_website_url_metadata(self):
+        url = self.state.website_url
+        update_metadata("output/metadata.json", "WebUrl", url)
 
-    # @listen("no")
-    # def maybe_build_website(self):
-    #     print("⚠️ Website generation skipped.")
-    #     print("\n=== Basic Meme Token Metadata ===\n")
-    #     print_metadata("output/metadata.json")
+    @listen(or_(update_website_url_metadata, "Not created"))
+    def update_telegram_url_metadata(self):
+        url = prompt_telegram_url()
+        if url:
+            update_metadata("output/metadata.json", "telegramUrl", url)
+
+    @listen(update_telegram_url_metadata)
+    def update_x_url_metadata(self):
+        url = prompt_x_url()
+        if url:
+            update_metadata("output/metadata.json", "xUrl", url)
+
+    @listen(update_x_url_metadata)
+    def finalize(self):
+        print("\n===🎉🎉🎉 Your MemeToken Metadata 🎉🎉🎉===\n")
+        print_metadata("output/metadata.json")
 
 
 def kickoff():

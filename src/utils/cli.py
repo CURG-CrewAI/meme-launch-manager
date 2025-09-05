@@ -33,7 +33,21 @@ def prompt_choice_trend(trends: list[dict], default: int = 1) -> dict | None:
     return selected_trend
 
 
-def prompt_make_site(prompt: str, default: str = "n") -> bool:
-    raw = input(f"\n{prompt} (default={default}): ").strip()
-    print(f"[DEBUG] Raw input: {repr(raw)}")
-    return raw.lower() in ("y", "yes")
+def prompt_make_site(default: str = "n") -> bool:
+    userInput = input(
+        f"\nDo you want to create and deploy a website? (default={default}): "
+    ).strip()
+    print(f"[DEBUG] Raw input: {repr(userInput)}")
+    return userInput.lower() in ("y", "yes")
+
+
+def prompt_telegram_url() -> str:
+    userInput = input("\nEnter your Telegram username or URL: ").strip()
+    print(f"[DEBUG] Raw input: {repr(userInput)}")
+    return userInput
+
+
+def prompt_x_url() -> str:
+    userInput = input("\nEnter your X(Twitter) username or URL:").strip()
+    print(f"[DEBUG] Raw input: {repr(userInput)}")
+    return userInput

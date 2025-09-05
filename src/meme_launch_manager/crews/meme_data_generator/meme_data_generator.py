@@ -2,7 +2,7 @@ from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import FileWriterTool, DallETool
-from typing import List
+from typing import Dict, List, Union
 
 from pydantic import BaseModel, Field
 from meme_launch_manager.tools.download_image_tool import DownloadImageTool
@@ -32,13 +32,8 @@ class ExtractedContent(BaseModel):
     extracted_content: List[ArticleContent]
 
 
-class MemeCoinMetaData(BaseModel):
-    name: str
-    symbol: str
-    description: str
-    features: List[str]
-    warning: str
-    hashtags: List[str]
+class MemeTokenMetaData(BaseModel):
+    memeTokenMetaData: Dict[str, Union[str, List[str]]]
 
 
 metadata_writer_tool = FileWriterTool(
@@ -135,7 +130,7 @@ class MemeDataGeneratorCrew:
         return Task(
             config=self.tasks_config["convert_json"],
             context=[self.write_satire()],
-            output_json=MemeCoinMetaData,
+            output_json=MemeTokenMetaData,
         )
 
     # @task
