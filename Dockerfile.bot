@@ -1,0 +1,23 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# 시스템 의존성 설치
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 의존성 설치
+COPY src/telegram_bot/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# CrewAI 및 기타 의존성
+COPY pyproject.toml .
+RUN pip install -e .
+
+# 소스 코드 복사
+COPY src/ ./src/
+COPY templates/ ./templates/
+
+# 실행
+CMD ["python", "-m", "src.telegram_bot.bot_improved"]

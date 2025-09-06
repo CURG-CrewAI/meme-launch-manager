@@ -1,0 +1,14 @@
+# 기존 의존성
+python-telegram-bot==20.7
+python-dotenv==1.0.0
+
+# 새로 추가된 의존성
+redis==5.0.1           # Redis 클라이언트
+httpx==0.25.2         # 비동기 HTTP 클라이언트 (KV API용)
+boto3==1.34.11        # R2 S3 호환 API
+celery==5.3.4         # 비동기 작업 큐 (선택적)
+python-rq==1.16.1     # 간단한 작업 큐 (Celery 대안)
+
+# 기존 CrewAI 관련 (그대로 유지)
+crewai
+crewai-tools

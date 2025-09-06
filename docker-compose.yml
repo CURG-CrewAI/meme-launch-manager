@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  # Redis - 로컬 캐시 및 락 관리
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+
+  # Python Telegram Bot (개선된 버전)
+  telegram-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    environment:
+      # Telegram
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+
+      # Cloudflare KV
+      - CF_ACCOUNT_ID=${CF_ACCOUNT_ID}
+      - CF_API_TOKEN=${CF_API_TOKEN}
+      - KV_NAMESPACE_ID=${KV_NAMESPACE_ID}
+
+      # Cloudflare R2
+      - R2_ACCESS_KEY_ID=${R2_ACCESS_KEY_ID}
+      - R2_SECRET_ACCESS_KEY=${R2_SECRET_ACCESS_KEY}
+      - R2_BUCKET_NAME=${R2_BUCKET_NAME}
+
+      # AI APIs
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - SERPER_API_KEY=${SERPER_API_KEY}
+
+    depends_on:
+      - redis
+    volumes:
+      - ./src:/app/src
+      - ./output:/app/output
+    restart: unless-stopped
+
+  # Optional: Redis Commander for debugging
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - "8081:8081"
+    depends_on:
+      - redis
+    profiles:
+      - debug
+
+volumes:
+  redis_data:

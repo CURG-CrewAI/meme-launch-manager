@@ -1,0 +1,34 @@
+# Railway 최적화 Dockerfile
+FROM python:3.11-slim
+
+# 작업 디렉토리
+WORKDIR /app
+
+# 시스템 패키지 (최소화)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Python 의존성 (캐시 활용)
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 소스 코드
+COPY src/ ./src/
+COPY templates/ ./templates/
+COPY pyproject.toml .
+
+# CrewAI 설치
+RUN pip install -e .
+
+# Railway는 PORT 환경변수 자동 설정
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# 헬스체크 (선택사항)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+
+# 실행
+CMD ["python", "-m", "src.telegram_bot.bot_improved"]
