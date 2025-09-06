@@ -1,9 +1,9 @@
 extract_token_moods:
   description: >
-    Primary Input (from context): {token_meta}
+    Primary Input (from context): {token_metadata}
 
     Task:
-      - Use the provided {token_meta} (name, symbol, description) from context
+      - Use the provided {token_metadata} (name, symbol, description) from context
       - Analyze the description to extract 5–10 diverse mood/style keywords in English
       - Ensure keywords reflect different style spectrums (energetic vs calm, modern vs retro, minimal vs bold, playful vs elegant)
       - Save the structured result into 'output/moods/token_mood.json' (for persistence)
@@ -22,13 +22,13 @@ extract_token_moods:
 
 write_website_contents:
   description: >
-    Create a tokeonomics and roadmap based on the {token_meta}.
+    Create a tokeonomics and roadmap based on the {token_metadata}.
 
     Your most important task is to maintain consistency.
-    The `✨Features` items presented in {token_meta}, **must** be taken and elaborated on in the `Special Features` section of `TOKENOMICS` that you will write.** Never ignore those ideas and create new mechanisms.
+    The `✨Features` items presented in {token_metadata}, **must** be taken and elaborated on in the `Special Features` section of `TOKENOMICS` that you will write.** Never ignore those ideas and create new mechanisms.
 
     💡 **Workflow Guide (Your Workflow):** 1.
-    1. carefully read the `✨ Features` section of the satire you received as {token_meta}.
+    1. carefully read the `✨ Features` section of the satire you received as {token_metadata}.
     2. Use the names of the features as the title of the `Special Features` section of `TOKENOMICS` that you will write.
     3. Be creative and fun in explaining how each feature works specifically from a Tokenomics perspective (e.g., staking, burning, rewards, etc.).
     4. If you want to add a new mechanic that wasn't in the satire (e.g. general burning), it's okay to do so **after** you've described all the existing features.

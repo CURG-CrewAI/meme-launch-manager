@@ -87,15 +87,19 @@ cross_validate_trending:
     Normalization rules (conservative):
     - Basic preprocessing: Unicode NFC, trim whitespace, lowercase (for English),
       collapse multiple spaces into one, strip punctuation at both ends.
-    - Anchor token merging (position-agnostic):
-      - If an alphanumeric token of length ≥ 3 (e.g., lck, mlb, aespa) appears as an
-        independent token at the **start**, **end**, or **middle** of another keyword
-        (separated by whitespace or punctuation), map that keyword to the anchor.
+
+    Here's the new rule set, which includes the category preservation logic.
+      * **Anchor Token Identification**: Identify an anchor token (e.g., namhansanseong, mantis) that appears as an independent word.
+      * **Keyword Mapping**: Map any keyword containing this anchor token to that anchor. The token can be at the **start**, **end**, or in the **middle** of the keyword, separated by a space or punctuation.
+      * **Category Preservation Rule**: If a keyword includes a specific **category** (e.g., movie, drama, musical), the final merged result should retain this category information.
+
       - Examples:
         - "lck 페이커" (X), "lck geng" (Signal), "lck 결승" (Namunews) → "lck"
         - "페이커 lck" (X), "lck 젠지" (Signal) → "lck"   
         - "mlb 오타니" (Google), "mlb standings" (X) → "mlb"
         - "aespa concert" (Signal), "aespa 카리나" (Namunews) → "aespa"
+        - "드라마 사마귀" (Signal), "사마귀" (Namunews) → "드라마 사마귀"
+        - "남한산성 영화" (Signal), "영화 남한산성" (Namunews), "남한산성 평점" (Google) → "영화 남한산성"
     - Substring merging (optional): If an alphanumeric anchor of length ≥ 3 appears as
       a contiguous substring in another keyword, and the remaining part is a proper noun
       or modifier, merge under the anchor.
