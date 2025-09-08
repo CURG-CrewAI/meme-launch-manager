@@ -1,0 +1,837 @@
+[
+  {
+    "key": "trust",
+    "emotion": "Trust",
+    "voice": "Clear, modern, reliable.",
+    "typography": {
+      "title_font": "Noto Sans KR",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#2563EB",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Use a solid rectangular CTA with crisp edges and strong black outline. Keep motion minimal.",
+        "shape": "rectangle",
+        "style_keywords": ["solid", "blue", "bold-outline", "balanced-padding"],
+        "must": [
+          "Use primary as fill",
+          "4px black border",
+          "8px radius max",
+          "Label in title font"
+        ],
+        "avoid": ["No gradient", "No skew or rotation"],
+        "example_css": "border:4px solid #000;border-radius:8px;background:#2563EB;color:#fff;padding:12px 16px;font-weight:900;"
+      },
+      "badge": {
+        "instruction": "Render a status tag that reads as trustworthy. Prefer a checkmark prefix.",
+        "shape": "rectangle",
+        "style_keywords": ["tag", "checkmark", "white-fill", "thin-radius"],
+        "must": ["Prefix '✔'", "Black 3px border"],
+        "avoid": ["No dashed borders", "No playful emojis"],
+        "example_css": "border:3px solid #000;border-radius:6px;background:#fff;color:#111;padding:6px 10px;"
+      },
+      "section": {
+        "instruction": "Use a clean section with a thin line header. Prioritize grids and whitespace.",
+        "layout": "stacked: header bar then content block",
+        "style_keywords": ["hairline", "structured", "quiet"],
+        "must": [
+          "Header with subtle light gradient",
+          "Clear divider line",
+          "Consistent 8/12px spacing"
+        ],
+        "avoid": ["No textures", "No clip-path cuts"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "about", "tokenomics", "community"],
+      "layout_instruction": "정돈된 12컬럼, 균형 잡힌 여백. 기능 설명 → 고객사 로고 → CTA 순."
+    }
+  },
+  {
+    "key": "friendly",
+    "emotion": "Friendly",
+    "voice": "Casual, warm, accessible.",
+    "typography": {
+      "title_font": "Jua",
+      "body_font": "Jua",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#FBBF24",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Use a rounded capsule that feels approachable. Slight glossy vertical gradient is OK.",
+        "shape": "capsule",
+        "style_keywords": ["rounded", "warm-yellow", "glossy"],
+        "must": [
+          "999px radius",
+          "Vertical gradient from pale to warm",
+          "Bold label"
+        ],
+        "avoid": ["No sharp corners", "No thin borders"],
+        "example_css": "border:4px solid #000;border-radius:999px;background:linear-gradient(180deg,#FFE08A,#FBBF24);color:#111;padding:12px 18px;"
+      },
+      "badge": {
+        "instruction": "Use a speech-bubble-like pill. It can include a small chat glyph.",
+        "shape": "speech-pill",
+        "style_keywords": ["pill", "bubble", "friendly"],
+        "must": ["Add '💬' suffix or small tail", "3px black border"],
+        "avoid": ["No square corners", "No metallic effects"],
+        "example_css": "border:3px solid #000;border-radius:999px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Rounded, cloud-like container with soft header color. Keep copy short and friendly.",
+        "layout": "rounded container with header then body",
+        "style_keywords": ["cloudy", "soft-shadow", "rounded"],
+        "must": ["Use clip-path for cloud corners", "Soft yellow header"],
+        "avoid": ["No rigid grid", "No harsh lines"],
+        "example_css": "border:4px solid #000;border-radius:16px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "left",
+      "image_position": "right",
+      "section_order": ["hero", "about", "community", "tokenomics"],
+      "layout_instruction": "둥근 모서리, 말풍선 느낌. 2열 카드 중심, 따뜻한 소개 흐름."
+    }
+  },
+  {
+    "key": "optimism",
+    "emotion": "Optimism",
+    "voice": "Forward, sunny, energetic.",
+    "typography": {
+      "title_font": "Do Hyeon",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#FACC15",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Star-shaped CTA to signal momentum. Prefer flat bright fill.",
+        "shape": "star",
+        "style_keywords": ["star", "bright-yellow", "poster"],
+        "must": ["Star clip-path", "Thick black outline"],
+        "avoid": ["No muted tones", "No thin labels"],
+        "example_css": "border:4px solid #000;padding:14px 18px;background:#FACC15;color:#111;clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);"
+      },
+      "badge": {
+        "instruction": "Sunny pill with a sun glyph.",
+        "shape": "pill",
+        "style_keywords": ["sunny", "cheerful"],
+        "must": ["Prefix '☀'", "999px radius"],
+        "avoid": ["No dark fills"],
+        "example_css": "border:3px solid #000;border-radius:999px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Header uses upward/diagonal stripes; body can hint upward lines.",
+        "layout": "header-stripes + body-upward-lines",
+        "style_keywords": ["upward", "striped", "bright"],
+        "must": [
+          "Repeating 135° stripe header",
+          "Body pattern with upward emphasis"
+        ],
+        "avoid": ["No heavy textures"],
+        "example_css": "border:4px solid #000;border-radius:14px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "community", "about", "tokenomics"],
+      "layout_instruction": "별·화살표가 위로 솟는 히어로. 상승하는 계단형 흐름."
+    }
+  },
+  {
+    "key": "elegance",
+    "emotion": "Elegance",
+    "voice": "Refined, traditional, lyrical.",
+    "typography": {
+      "title_font": "Nanum Myeongjo",
+      "body_font": "Nanum Myeongjo",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#E5E5E5",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Minimal white button with subtle gold inner stroke. Serif title.",
+        "shape": "rectangle",
+        "style_keywords": ["minimal", "gold-line", "serif"],
+        "must": [
+          "3px black border + 3px gold inner stroke",
+          "Tight letterspacing"
+        ],
+        "avoid": ["No bright rainbow", "No cartoon shadows"],
+        "example_css": "border:3px solid #000;border-radius:6px;background:#fff;color:#111;box-shadow:inset 0 0 0 3px #C6A969;"
+      },
+      "badge": {
+        "instruction": "Ribbon-style badge with small gold tails.",
+        "shape": "ribbon",
+        "style_keywords": ["ribbon", "classic"],
+        "must": ["Add gold tails with slanted caps"],
+        "avoid": ["No emoji"],
+        "example_css": "border:2px solid #000;border-radius:6px;background:#fff;color:#111;padding:6px 16px;"
+      },
+      "section": {
+        "instruction": "Double-border frame, generous whitespace, quiet header.",
+        "layout": "double-border + minimal header",
+        "style_keywords": ["spacious", "refined"],
+        "must": ["Double border frame", "Light gray header"],
+        "avoid": ["No patterns", "No stickers"],
+        "example_css": "border:double 4px #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "about", "tokenomics", "community"],
+      "layout_instruction": "풀스크린 히어로, 여백 극대화. 미니멀 단일 컬럼."
+    }
+  },
+  {
+    "key": "anger",
+    "emotion": "Anger",
+    "voice": "Immediate, sharp, explosive.",
+    "typography": {
+      "title_font": "Nanum Brush Script",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#EF4444",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Aggressive brush/stripe fill, slightly skewed rectangle.",
+        "shape": "skew-rect",
+        "style_keywords": ["brush", "zigzag", "red"],
+        "must": ["5px+ outline", "Skew -3°", "High contrast label"],
+        "avoid": ["No soft gradients", "No rounded capsule"],
+        "example_css": "border:5px solid #000;border-radius:10px;background:repeating-linear-gradient(135deg,#EF4444 0 10px,#FF6B6B 10px 20px);transform:skew(-3deg);"
+      },
+      "badge": {
+        "instruction": "Lightning themed badge with dashed outline.",
+        "shape": "round-rect",
+        "style_keywords": ["dashed", "lightning"],
+        "must": ["Prefix '⚡'", "4px dashed border"],
+        "avoid": ["No pastel fills"],
+        "example_css": "border:4px dashed #000;border-radius:10px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Torn/serrated bottom edge to imply rupture.",
+        "layout": "torn-bottom",
+        "style_keywords": ["jagged", "raw"],
+        "must": ["Clip-path zigzag bottom", "Solid red header"],
+        "avoid": ["No symmetrical soft corners"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "right",
+      "image_position": "left",
+      "section_order": ["hero", "tokenomics", "about", "community"],
+      "layout_instruction": "빨간 헤드라인이 깨고 들어옴. 비대칭 배치, 불규칙 CTA."
+    }
+  },
+  {
+    "key": "defense",
+    "emotion": "Defense",
+    "voice": "Strong, firm, decisive.",
+    "typography": {
+      "title_font": "Black Han Sans",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#4B5563",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Steel-like rectangle with thick outline and inner stroke.",
+        "shape": "rectangle",
+        "style_keywords": ["steel", "thick", "blocky"],
+        "must": ["5px outline + inner dark stroke", "Low radius ≤6px"],
+        "avoid": ["No skew", "No soft bubbles"],
+        "example_css": "border:5px solid #000;border-radius:6px;background:linear-gradient(180deg,#9CA3AF,#4B5563);box-shadow:inset 0 0 0 6px #1F2937;"
+      },
+      "badge": {
+        "instruction": "Shield-leaning tag.",
+        "shape": "rect",
+        "style_keywords": ["shield", "strong"],
+        "must": ["Prefix '🛡️'", "4px border"],
+        "avoid": ["No dashed border"],
+        "example_css": "border:4px solid #000;border-radius:6px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Heavier border block with dark header.",
+        "layout": "heavy-block",
+        "style_keywords": ["fortified", "dense"],
+        "must": ["6px border", "Dark header, white body"],
+        "avoid": ["No asymmetry"],
+        "example_css": "border:6px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "left",
+      "image_position": "right",
+      "section_order": ["hero", "about", "tokenomics", "community"],
+      "layout_instruction": "블록형 카드들이 성벽처럼 나열. 굵은 테두리."
+    }
+  },
+  {
+    "key": "confusion",
+    "emotion": "Confusion",
+    "voice": "Asymmetric, uneasy, offbeat.",
+    "typography": {
+      "title_font": "Single Day",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#8B5CF6",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Twisted/skewed rectangle; off-axis label allowed.",
+        "shape": "twisted-rect",
+        "style_keywords": ["tilt", "purple", "odd"],
+        "must": ["Skew or rotate 3–8°", "Thick border"],
+        "avoid": ["No perfect symmetry"],
+        "example_css": "border:5px solid #000;border-radius:12px;background:#8B5CF6;transform:skew(8deg) rotate(-3deg);"
+      },
+      "badge": {
+        "instruction": "Dotted outline with ?! token.",
+        "shape": "round-rect",
+        "style_keywords": ["dotted", "quirky"],
+        "must": ["Set text '?!'", "12px radius"],
+        "avoid": ["No emojis"],
+        "example_css": "border:4px dotted #000;border-radius:12px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Broken layout feel: dashed frame; striped header.",
+        "layout": "broken-dashed",
+        "style_keywords": ["asymmetric", "striped"],
+        "must": ["Dashed border", "Striped header"],
+        "avoid": ["No clean minimal lines"],
+        "example_css": "border:5px dashed #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "tokenomics", "community", "about"],
+      "layout_instruction": "비대칭 레이아웃, 기울어진 카드. 불안정한 구도."
+    }
+  },
+  {
+    "key": "remin",
+    "emotion": "Reminiscence",
+    "voice": "Nostalgic, warm, story-like.",
+    "typography": {
+      "title_font": "Nanum Myeongjo",
+      "body_font": "Nanum Myeongjo",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#C4A484",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Typewriter-flavored small rectangle; serif label.",
+        "shape": "rectangle-small",
+        "style_keywords": ["sepia", "typewriter"],
+        "must": ["Thin radius 4px", "Warm paper fill"],
+        "avoid": ["No neon", "No heavy gradients"],
+        "example_css": "border:3px solid #000;border-radius:4px;background:#EBD6BE;"
+      },
+      "badge": {
+        "instruction": "Stamp-like badge with dotted teeth.",
+        "shape": "stamp",
+        "style_keywords": ["perforated", "postal"],
+        "must": ["Dotted outline", "Square corners"],
+        "avoid": ["No round pills"],
+        "example_css": "border:3px dotted #000;border-radius:0;background:#fff;color:#111;padding:6px 10px;"
+      },
+      "section": {
+        "instruction": "Paper-toned container with slightly darker header strip.",
+        "layout": "paper",
+        "style_keywords": ["sepia", "quiet"],
+        "must": ["Header in sand tone", "Body in lighter paper"],
+        "avoid": ["No black-heavy fill"],
+        "example_css": "border:4px solid #000;border-radius:10px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "about", "community", "tokenomics"],
+      "layout_instruction": "종이 질감, 수직 타임라인. 향수 자극."
+    }
+  },
+  {
+    "key": "joy",
+    "emotion": "Joy",
+    "voice": "Festive, bubbly, playful.",
+    "typography": {
+      "title_font": "Jua",
+      "body_font": "Do Hyeon",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#F59E0B",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Circle button with rainbow conic fill. Big, fun label.",
+        "shape": "circle",
+        "style_keywords": ["rainbow", "round", "party"],
+        "must": ["999px radius", "Conic rainbow fill"],
+        "avoid": ["No dark fills"],
+        "example_css": "border:5px solid #000;border-radius:999px;background:conic-gradient(#F59E0B,#FDE047,#22D3EE,#F472B6,#F59E0B);"
+      },
+      "badge": {
+        "instruction": "Pill with balloon cue.",
+        "shape": "pill",
+        "style_keywords": ["balloon", "cheer"],
+        "must": ["Add 🎈 suffix"],
+        "avoid": ["No thin borders"],
+        "example_css": "border:4px solid #000;border-radius:999px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Party strip header; simple white body.",
+        "layout": "party",
+        "style_keywords": ["confetti", "stripe"],
+        "must": ["Repeating bright diagonal header"],
+        "avoid": ["No muted palette"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "community", "about", "tokenomics"],
+      "layout_instruction": "컬러풀 배경, 원형 카드 나열. 파티 분위기."
+    }
+  },
+  {
+    "key": "sad",
+    "emotion": "Sadness",
+    "voice": "Calm, reflective, subdued.",
+    "typography": {
+      "title_font": "Nanum Myeongjo",
+      "body_font": "Gowun Dodum",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#1E3A8A",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Droplet-ish rounded rectangle in deep blue with white label.",
+        "shape": "droplet",
+        "style_keywords": ["deep-blue", "soft", "rounded-bottom"],
+        "must": ["Rounded bottom radii larger", "White label for contrast"],
+        "avoid": ["No rainbow", "No harsh stripes"],
+        "example_css": "border:4px solid #000;border-radius:20px 20px 28px 28px;background:#1E3A8A;color:#fff;"
+      },
+      "badge": {
+        "instruction": "Soft gray rounded badge with subtle opacity.",
+        "shape": "round-rect",
+        "style_keywords": ["muted", "soft"],
+        "must": ["Opacity ~0.85", "10px radius"],
+        "avoid": ["No high contrast emojis (except 💧)"],
+        "example_css": "border:3px solid #000;border-radius:10px;background:#E5E7EB;color:#111;opacity:.85;"
+      },
+      "section": {
+        "instruction": "Quiet gradient header from pale blue to mid blue.",
+        "layout": "quiet",
+        "style_keywords": ["gentle", "gradual"],
+        "must": ["Vertical gradient header", "Plain white body"],
+        "avoid": ["No jagged edges"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "about", "tokenomics", "community"],
+      "layout_instruction": "여백이 많은 1열 중심. 잔잔하고 차분."
+    }
+  },
+  {
+    "key": "fear",
+    "emotion": "Fear",
+    "voice": "Threatening, heavy, uneasy.",
+    "typography": {
+      "title_font": "Single Day",
+      "body_font": "Gowun Batang",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#7F1D1D",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Dark radial gradient red, thick outline; label can be terse.",
+        "shape": "rounded",
+        "style_keywords": ["ominous", "radial", "red"],
+        "must": ["5px outline", "Tight radius 10px"],
+        "avoid": ["No friendly emojis"],
+        "example_css": "border:5px solid #000;border-radius:10px;background:radial-gradient(circle at 30% 30%,#7F1D1D,#3b0a0a);color:#fff;"
+      },
+      "badge": {
+        "instruction": "Dashed outline rectangular badge with skull prefix.",
+        "shape": "round-rect",
+        "style_keywords": ["skull", "dashed", "white"],
+        "must": ["Prefix ☠", "4px dashed border"],
+        "avoid": ["No soft gradients"],
+        "example_css": "border:4px dashed #000;border-radius:10px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Torn-bottom container; dark red header.",
+        "layout": "torn",
+        "style_keywords": ["torn", "threat"],
+        "must": ["Clip-path torn bottom", "Dark red header"],
+        "avoid": ["No rounded clouds"],
+        "example_css": "border:4px solid #000;border-radius:10px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "right",
+      "image_position": "left",
+      "section_order": ["hero", "tokenomics", "community", "about"],
+      "layout_instruction": "어두운 배경, 찢긴 섹션 구분. 긴장감 유지."
+    }
+  },
+  {
+    "key": "excite",
+    "emotion": "Excitement",
+    "voice": "Bold, energetic, shouty.",
+    "typography": {
+      "title_font": "Do Hyeon",
+      "body_font": "Black Han Sans",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#F97316",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Neon orange rectangle with bold label; think ‘hype’ sticker.",
+        "shape": "rectangle",
+        "style_keywords": ["neon", "bold", "poster"],
+        "must": ["Strong gradient orange", "Thick outline"],
+        "avoid": ["No pale colors"],
+        "example_css": "border:5px solid #000;border-radius:8px;background:linear-gradient(180deg,#FF9F40,#F97316);"
+      },
+      "badge": {
+        "instruction": "Thick black border rectangular badge with exclamation suffix.",
+        "shape": "rect",
+        "style_keywords": ["loud", "exclaim"],
+        "must": ["Suffix !!!", "4px border"],
+        "avoid": ["No soft shadows"],
+        "example_css": "border:4px solid #000;border-radius:6px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Comic-bar style header with hot colors.",
+        "layout": "comic",
+        "style_keywords": ["comic", "hot-stripes"],
+        "must": ["135° repeating orange/red header"],
+        "avoid": ["No muted body"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "left",
+      "image_position": "right",
+      "section_order": ["hero", "community", "about", "tokenomics"],
+      "layout_instruction": "만화책 패널 느낌. CTA 반복 배치."
+    }
+  },
+  {
+    "key": "calm",
+    "emotion": "Calm",
+    "voice": "Soothing, balanced, breathable.",
+    "typography": {
+      "title_font": "Gowun Dodum",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#10B981",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Pastel mint rounded rectangle; soft shadow acceptable.",
+        "shape": "rounded",
+        "style_keywords": ["pastel", "gentle", "rounded"],
+        "must": ["14px radius", "Solid mint fill"],
+        "avoid": ["No harsh patterns"],
+        "example_css": "border:4px solid #000;border-radius:14px;background:#10B981;"
+      },
+      "badge": {
+        "instruction": "Pill with leaf suffix.",
+        "shape": "pill",
+        "style_keywords": ["nature", "quiet"],
+        "must": ["Suffix 🌿", "3px border"],
+        "avoid": ["No neon fills"],
+        "example_css": "border:3px solid #000;border-radius:999px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Soft header and airy body; large padding.",
+        "layout": "soft",
+        "style_keywords": ["air", "space"],
+        "must": ["Header in pale mint", "Generous line-height"],
+        "avoid": ["No dense grids"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "about", "tokenomics", "community"],
+      "layout_instruction": "넓은 여백, 미니멀한 2열 정보. 차분하고 안정."
+    }
+  },
+  {
+    "key": "future",
+    "emotion": "Futuristic",
+    "voice": "Technical, futuristic, precise.",
+    "typography": {
+      "title_font": "IBM Plex Mono",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#22D3EE",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Neon cyan rectangle with pixel-ish solidity; monospace label.",
+        "shape": "rectangle",
+        "style_keywords": ["neon-cyan", "tech", "mono"],
+        "must": ["Cyan gradient", "6px radius"],
+        "avoid": ["No rounded capsules"],
+        "example_css": "border:5px solid #000;border-radius:6px;background:linear-gradient(180deg,#67E8F9,#22D3EE);font-family:'IBM Plex Mono',monospace;"
+      },
+      "badge": {
+        "instruction": "Code-like square badge; may include </> token.",
+        "shape": "rect",
+        "style_keywords": ["code", "square"],
+        "must": ["Use monospace", "Prefix </>"],
+        "avoid": ["No emojis"],
+        "example_css": "border:4px solid #000;border-radius:6px;background:#fff;color:#111;padding:8px 12px;font-family:'IBM Plex Mono',monospace;"
+      },
+      "section": {
+        "instruction": "Grid-lined body under a cyan header; tech dashboard vibe.",
+        "layout": "grid",
+        "style_keywords": ["grid", "cyan", "tech"],
+        "must": ["Grid overlay 18px", "Cyan header stripes"],
+        "avoid": ["No torn/sticker edges"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "left",
+      "image_position": "right",
+      "section_order": ["hero", "about", "tokenomics", "community"],
+      "layout_instruction": "네온 그리드 히어로, 대시보드 같은 세밀한 12~16열."
+    }
+  },
+  {
+    "key": "playful",
+    "emotion": "Playful",
+    "voice": "Witty, bouncy, informal.",
+    "typography": {
+      "title_font": "Single Day",
+      "body_font": "Jua",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#F472B6",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Rounded, slightly tilted, with conic candy fill.",
+        "shape": "rounded-tilt",
+        "style_keywords": ["candy", "tilt", "fun"],
+        "must": ["Tilt ±2°", "Thick outline"],
+        "avoid": ["No strict alignment"],
+        "example_css": "border:5px solid #000;border-radius:22px;background:conic-gradient(#F472B6,#A78BFA,#F472B6);transform:rotate(-2deg);"
+      },
+      "badge": {
+        "instruction": "Dashed outline rounded badge; can read LOL 😂.",
+        "shape": "round-rect",
+        "style_keywords": ["dashed", "sticker"],
+        "must": ["Use 'LOL 😂' or similar playful copy"],
+        "avoid": ["No formal words"],
+        "example_css": "border:4px dashed #000;border-radius:20px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Sticker-cut bottom or asymmetrical edges.",
+        "layout": "sticker",
+        "style_keywords": ["asymmetric", "sticker"],
+        "must": ["Clip-path notch bottom"],
+        "avoid": ["No double-border classic look"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "community", "about", "tokenomics"],
+      "layout_instruction": "짤 자막 느낌, 스티커 카드. 자유로운 배치."
+    }
+  },
+  {
+    "key": "alert",
+    "emotion": "Alert",
+    "voice": "Urgent, assertive, unmistakable.",
+    "typography": {
+      "title_font": "Black Han Sans",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#F59E0B",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Triangle-shaped CTA that grabs attention immediately.",
+        "shape": "triangle",
+        "style_keywords": ["warning", "triangle", "high-contrast"],
+        "must": ["Triangle clip-path", "Thick outline"],
+        "avoid": ["No rounded shapes"],
+        "example_css": "border:5px solid #000;clip-path:polygon(50% 0,0 100%,100% 100%);background:#F59E0B;"
+      },
+      "badge": {
+        "instruction": "Rect badge with ⚠️ and bold word like '주의'.",
+        "shape": "rect",
+        "style_keywords": ["danger", "bold"],
+        "must": ["Prefix ⚠️", "All caps allowed"],
+        "avoid": ["No subtle colors"],
+        "example_css": "border:4px solid #000;border-radius:6px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Diagonal hazard stripes in header; plain white body for readability.",
+        "layout": "hazard",
+        "style_keywords": ["stripes", "yellow-black"],
+        "must": ["Repeating 135° stripes", "Strong divider"],
+        "avoid": ["No gradients that soften contrast"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "tokenomics", "about", "community"],
+      "layout_instruction": "상단 경고 배너 ⚠️, 굵은 CTA 강조. 강한 구분선."
+    }
+  },
+  {
+    "key": "stability",
+    "emotion": "Stability",
+    "voice": "Stable, consistent, trustworthy.",
+    "typography": {
+      "title_font": "Black Han Sans",
+      "body_font": "Noto Sans KR",
+      "usage": "Use title font for headlines and CTA labels; use body font for body copy and long text."
+    },
+    "palette": {
+      "primary": "#16A34A",
+      "background_rule": "Derive background by boosting primary saturation by ~+30% and value to ≥90% (poster tone).",
+      "text_rule": "Derive text by desaturating primary to ≤15% saturation and reducing value to ≈20–30% (near black).",
+      "accent_rule": "Accent can be primary with +0.04 hue shift and +10–20% saturation for chips/badges."
+    },
+    "components": {
+      "button": {
+        "instruction": "Solid green rectangular button; steady, no gimmicks.",
+        "shape": "rectangle",
+        "style_keywords": ["solid", "green", "steady"],
+        "must": ["6px radius", "White label"],
+        "avoid": ["No tilt", "No stripes"],
+        "example_css": "border:5px solid #000;border-radius:6px;background:#16A34A;color:#fff;"
+      },
+      "badge": {
+        "instruction": "Square-ish check badge.",
+        "shape": "rect",
+        "style_keywords": ["check", "square"],
+        "must": ["Prefix ✅", "4px border"],
+        "avoid": ["No dashed", "No emojis beyond check"],
+        "example_css": "border:4px solid #000;border-radius:6px;background:#fff;color:#111;padding:8px 12px;"
+      },
+      "section": {
+        "instruction": "Regular grid feel; pale green header bar; consistent spacing.",
+        "layout": "regular-grid",
+        "style_keywords": ["order", "predictable"],
+        "must": ["Equal gutters", "Simple header bar"],
+        "avoid": ["No odd angles"],
+        "example_css": "border:4px solid #000;border-radius:12px;overflow:hidden;"
+      }
+    },
+    "layout": {
+      "hero_alignment": "center",
+      "image_position": "top",
+      "section_order": ["hero", "about", "community", "tokenomics"],
+      "layout_instruction": "반복되는 카드 패턴, 규칙적인 격자. 안정감 강조."
+    }
+  }
+]
