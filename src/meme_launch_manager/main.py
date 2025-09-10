@@ -44,9 +44,10 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
     @listen(select_trend)
     def run_meme_data_generator(self):
         selected_trend = self.state.selected_trend
-        token_metadata = MemeDataGeneratorCrew().crew().kickoff(inputs=selected_trend)
-        self.io.send_json("output/metadata.json")
-        self.state.token_metadata = token_metadata
+        self.state.token_metadata = (
+            MemeDataGeneratorCrew().crew().kickoff(inputs=selected_trend)
+        )
+        self.io.send(f"{self.state.token_metadata}")
 
     @router(run_meme_data_generator)
     def ask_edit_image(self):
@@ -106,9 +107,10 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
     @listen("Generated")
     def run_website_developer(self):
-        token_metadata = self.state.token_metadata["memeTokenMetaData"]
+        token_metadata = self.state.token_metadata
+        print(token_metadata)
         self.state.website_url = (
-            WebsiteDeveloper().crew().kickoff(inputs={"token_metadata": token_metadata})
+            WebsiteDeveloper().crew().kickoff(inputs=token_metadata)
         )
 
     @listen(run_website_developer)
@@ -142,3 +144,19 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         except Exception as e:
             self.io.send(f"Error")
             raise
+
+
+def plot():
+    flow = MemeLaunchFlow()
+    flow.plot()
+
+
+def test():
+    flow = MemeLaunchFlow()
+
+    flow.state.selected_trend = {
+        "keyword": "칼라마네로",
+        "why_trending": "Calamaneiro is trending due to its involvement in recent Pokémon game updates and media releases, generating excitement among fans. Upcoming announcements about its role in new game content are keeping the community engaged and discussing its potential impact.",
+    }
+
+    flow.run_meme_data_generator()

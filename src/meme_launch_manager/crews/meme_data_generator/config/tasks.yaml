@@ -1,16 +1,16 @@
 collect_news_url:
   description: >
-    Based on the given keyword '{keyword}' and the reason it is trending '{why_trending}', you need to find the most accurate and relevant latest Korean news articles.
-    Instead of simply searching with the keyword, use the following search strategy to improve quality:
-    -	Target specific news portals: Search directly on trusted major portals such as
-      "{keyword}" site:news.naver.com or "{keyword}" site:v.daum.net.
-    -	Context-based search: Extract key terms from the trending reason and combine them with the keyword.
-      Example: "{keyword}"
-    - Latest keyword search: Combine with terms like "{keyword}" latest news or "{keyword}" official statement to ensure the most recent updates.
+    Based on the given keyword {keyword} and trending reason {why_trending}, you need to find the most accurate and relevant latest Korean news articles.
 
-    Using these strategies together, find 3–5 reliable and up-to-date articles. Collect the title, URL, and a short summary for each.
+    Instead of simply searching by keywords alone, use the following search strategies to improve search quality:
 
-    Output : a JSON-formatted string containing information on 5 to 7 reliable, recent articles.
+    1. **Targeted News Portal Search:** Directly target high-credibility major portals like `{keyword} site:news.naver.com` or `{keyword} site:v.daum.net`.
+    2. **Context-Driven Search:** Extract key terms from the trending reason and combine them with the search term. Example: `{keyword}`
+    3. **Latest News Search:** Combine keywords like `{keyword} 최신 뉴스` or `{keyword} 공식입장` to find the most recent information.
+
+    Using these strategies comprehensively, collect 3-5 reliable latest articles with titles, URLs, and brief summaries.
+
+    Output must be JSON object including articles info
 
   expected_output: >
     Your response MUST be valid JSON, like this:
@@ -46,25 +46,47 @@ extract_main_article:
         ]
       }
 
-    Goal : extract the main article content.
+    Extract body content from input including articles input
 
-    Extraction requirements:
-      1.	Access each URL and extract the article body.
-      2.	Focus on the title and the key information from the first 2–3 paragraphs.
-      3.	Exclude ads, related articles, comments, and irrelevant content.
-      4.	Summarize only the essential facts and contextual information.
-      5.	Clearly identify the background of the issue and the current situation.
+    Extraction Requirements:
+    1. Access each URL and extract article body content
+    2. Focus on extracting titles and key content from the first 2-3 paragraphs
+    3. Exclude advertisements, related articles, comments, etc.
+    4. Organize only key facts and contextual information
+    5. Clearly identify issue background and current situation
+    6. Skip inaccessible or failed extraction URLs and continue processing
+    7. Write results using only successfully extracted articles
+    8. Consider task complete if at least 1 article is successfully extracted
+    9. If Unicode decoding errors occur, skip that specific article and continue
+    10. Basic Quality Filters:
+      - If content is shorter than 200 characters, skip (extraction failure)
+      - If same exact sentence repeats 3+ times (not necessarily consecutive), skip
+      - If content consists of 75%+ identical repeated elements (phrases, words, or characters), skip
+      - If content has less than 30 unique characters total, skip
+      - If content contains less than 4 different complete sentences, skip
+    11. Korean News Site Specific:
+      - If content is primarily site navigation menus or footer text, skip
+      - Focus on extracting content within article body tags, not header/sidebar elements
+    12. If content contains repeated HTML tag names (div, span, etc.) more than 10 times, skip
 
-    Output : Extracted article texts in JSON format
+    Error Handling:
+    - Exclude only the specific article for URL access failures, scraping blocks, etc.
+    - Log failed articles but do not stop the entire operation
+    - Compose extracted_content array only with extractable articles
+            
+
+    Output must be JSON object including extracted content info
   expected_output: >
     Your response MUST be valid JSON, like this:
       {
           "extracted_content": [
               {
-                  "title": "Article Title",
-                  "content": "Extracted key content",
-                  "key_points": ["Key point 1", "Key point 2", "Key point 3"],
-                  "background": "Issue background"
+                "title": "Article Title",
+                "url": "Article URL",
+                "content": "Extracted Key Body Content",
+                "key_points": ["Key Point 1", "Key Point 2", "Key Point 3"],
+                "background": "Issue Background",
+                "source": "Media Outlet Name"
               }
           ]
       }
@@ -72,154 +94,235 @@ extract_main_article:
 
   agent: article_extractor
 
-write_satire:
+translate_summarize_articles:
   description: >
-    Write a satirical English meme coin article based on the information collected for the keyword '{keyword}'.  
-              
-    Satire requirements:  
-      1. title: creative meme coin name and ticker ex) Sonnywood, $SONNY   
-      2. body: a funny English description of the issue (100-250 words)
-      3. features: 1-4 humorous features of the meme coin in question (in English)
-      4. caveats: satirical investment advice and disclaimers (in English)
-      5. hashtags: 5-7 relevant English hashtags
+    You will receive a JSON object from the previous task (extract_main_article), which contains article info
 
-    Tone & Manners:
-      - Humorous but classy
-      - Use English that a global audience can understand
-      - Use emojis appropriately
-      - Mix in irony and sarcasm. Utilize hyperbole, analogies, puns, etc.
-      - Explain the Korean cultural context well in English
-      - Communicate unfamiliar Korean issues in an understandable way
+    The input will look like this:
+      {
+          "extracted_content": [
+              {
+                "title": "Article Title",
+                "url": "Article URL",
+                "content": "Extracted Key Body Content",
+                "key_points": ["Key Point 1", "Key Point 2", "Key Point 3"],
+                "background": "Issue Background",
+                "source": "Media Outlet Name"
+              }
+          ]
+      }
 
-    ⚠️ Important: Write everything in English.
+    Compile, summarize, and translate the extracted JSON format article content from input and then Write their sources
 
-    Writing format:
-      🚀 [COIN_NAME] Emergency Launch! 
-              
-      "[English Catchphrase]"
-      
-      [Korean issue explained in English with humor]
-      
-      ✨ Features:
-      - Feature 1 in English
-      - Feature 2 in English
-      - Feature 3 in English
-      
-      ⚠️ Investment Warning: 
-      [Disclaimer in English about this being entertainment only]
-      
-      #hashtag1 #hashtag2 #hashtag3 #hashtag4 #hashtag5
+    How to write korean_issue_summary:
+      1. Comprehensively analyze all article content in the extracted_content array
+      2. Identify common themes and key content from multiple articles
+      3. Extract 2-3 key keywords suitable for image generation (key person names, places, core concepts, key objects, etc.)
+        - Examples: "Son Heung-min, LAFC Stadium, Soccer Ball"
+        - Select keywords focusing on specific, searchable nouns
+        - Prioritize visually representable elements over abstract concepts
+      4. Write content within 200-300 words total
+      5. Include actual URLs in the Sources section
+      6. Include Korean cultural context and background explanations for foreign understanding
+      7. Translate everything into English considering foreign readers
 
-      Writing Guide (Few Shots):
-        Below is an example of a successful satirical piece written on the topic of "Actors' Private Lives Cannot Be Verified."
-        Learn from the creative approach used in this example and apply it to your own work.
+    How to write sources:
+      - Write media outlet names, article titles, and source URLs in English.
+      - Must include all sources used for compilation.
+      - Provide 2-3 or more different media outlet sources when possible.
+      - List as many as the actual number of referenced articles.
 
-      Topic: Actor Jung Woo-sung(정우성)'s official statement that "it is impossible to confirm his private life"
-      
-      Excellent Features Writing Example:
-      ✨ Features:
-        - Non-Denial-Denial Protocol: Transactions are never officially confirmed, they just appear on the blockchain. We respect their privacy.
-        - Plot Twist Burn Mechanism: A small percentage of the total supply is automatically burned every time a shocking new personal detail about a major public figure is "unable to be confirmed."
-        - Stealth Wedding Rewards: Holders are airdropped bonus tokens when a long-term bachelor/bachelorette finally—and quietly—gets married without a press release.
+      Note: Use actual URLs, not [URL Placeholder].
+            
+    Output must be JSON object including korean_issue_summary and sources
 
-
-      Key learning points: Do not simply follow the examples above.
-      Instead, your task is to maximize humor by cleverly packaging the core concepts of satire using plausible blockchain-related technical terms such as "Protocol," "Mechanism," "Rewards," "Tokenomics," and "Governance." Select the terms that best fit the topic creatively.
-      For example, when satirizing politicians, Governance Model or Voting System might be more appropriate, while Supply Chain Tokenomics could be more entertaining for food-related issues.
-
-      Good Investment Warning Example:
-        ⚠️ A Note From Our Legal Team (Probably):
-        Look, this is an emotional support token, not a financial instrument. Our entire whitepaper is a rumor someone started in a group chat. The liquidity pool is filled with pure, unadulterated speculation. Any resemblance to actual persons, living or dead, or actual events is purely coincidental and, frankly, a matter of their private life we cannot confirm. Buying this token will not make you rich, but it might make you laugh while you lose money on other, more serious-looking coins. This is not financial advice. This is performance art. DYOR (Do Your Own Research... on everything).
-
-      Key learning point: Do not follow the above example exactly.
-      However, we recommend the strategy of writing the entire warning message as if you were a meme coin developer, pretending to warn people while continuing with humorous satire.
-
-  expected_output: >
-    Completed English meme coin satire
-  agent: satirist
-
-convert_json:
-  description: >
-    Convert all the information generated in the previous step (satire) into a JSON format
-
-    Notes:
-    1. keep all text in English
-    2. format the JSON exactly
-    3. keep special characters or emojis, but process them so that they don't cause problems in the JSON
-    4. categorize and lay out the content of each section correctly
-    5. save metadata.json in output/
   expected_output: >
     Your response MUST be valid JSON, like this:
       {
-        "name": "Memecoin full name",
-        "symbol": "Memecoin ticker",
-        "description": "Body description",
-        "features": ["feature1", "feature2", "feature3"],
-        "warning": "Investment warning",
-        "hashtags": ["hashtag1", "hashtag2", "hashtag3"],
+        "korean_issue_summary": {
+            "title": "Issue Title",
+            "key_visual_keywords": ["Keyword1","Keyword2","Keyword3"]
+            "background": "Korean cultural/social context explanation",
+            "what_happened": "Current situation and major events",
+            "key_points": [
+                "keypoint1",       
+                "keypoint2",
+                "keypoint3"
+            ],
+            "why_it_matters": "Why this issue is important and noteworthy"
+        },
+        "sources": [
+            {
+                "outlet": "Media Outlet",
+                "title": "Article Title",
+                "url": "URL"
+            },...
+        ]
+      }
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
+  agent: summary_translation_agent
+
+write_description:
+  description: >
+    You will receive a JSON object from the previous task (translate_summarize_articles), which contains summary and sources
+
+    The input will look like this:
+      {
+        "korean_issue_summary": {
+            "title": "Issue Title",
+            "key_visual_keywords": ["Keyword1","Keyword2","Keyword3"]
+            "background": "Korean cultural/social context explanation",
+            "what_happened": "Current situation and major events",
+            "key_points": ["keypoint1", "keypoint2","keypoint3"],
+            "why_it_matters": "Why this issue is important and noteworthy"
+        },
+        "sources": [
+            {
+                "outlet": "Media Outlet",
+                "title": "Article Title",
+                "url": "URL"
+            },...
+        ]
+      }
+
+    Goal: Create a concise 3-4 sentence description that sets the overall tone for the website based on Korean issue summary .
+
+    Requirements:
+      - Length: 3-4 sentences, 80-120 words
+      - Purpose: Core summary for token description
+      - Include: Who, what, why it's problematic (briefly)
+      - Exclude: Detailed background explanations, Key Points listing
+      - Tone: Information-focused neutral tone
+      - Target: Foreign readers unfamiliar with Korean issues
+
+    Writing Guide:
+      1. First sentence: Simply explain who did what
+      2. Second sentence: Core issues or problems
+      3. Final sentence: Why this issue is important
+
+    Example: "South Korean lawmaker Lee Chun-seok is under investigation for alleged stock trading using nominee accounts worth 1 billion won. The amount significantly exceeds his declared assets, raising questions about the source of funds. This case highlights ongoing concerns about financial transparency in Korean politics."
+
+    Reference the example but do not copy it directly.
+
+  expected_output: >
+    Your response MUST be valid JSON, like this:
+      {
+        "description": "summary description"
+      }
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
+  agent: description_writer
+
+write_satire:
+  description: >
+    You will receive a JSON object from the previous task (translate_summarize_articles), which contains summary and sources
+
+    The input will look like this:
+      {
+        "korean_issue_summary": {
+            "title": "Issue Title",
+            "key_visual_keywords": ["Keyword1","Keyword2","Keyword3"]
+            "background": "Korean cultural/social context explanation",
+            "what_happened": "Current situation and major events",
+            "key_points": ["keypoint1", "keypoint2","keypoint3"],
+            "why_it_matters": "Why this issue is important and noteworthy"
+        },
+        "sources": [
+            {
+                "outlet": "Media Outlet",
+                "title": "Article Title",
+                "url": "URL"
+            },...
+        ]
+      }
+
+    Write English memecoin satirical content based on the input which contains summary and sources.
+
+    Goal: 
+    You have six things you need to create:
+      - name
+      - symbol
+      - catchphrase
+      - satire
+      - feature
+      - hashtags
+
+    The below content will mainly be about how to write the satire. The other five things will be created based on the satire.
+
+    Satirical Content Requirements:
+      1. Title: Creative memecoin name and ticker ex) Sonnywood, $SONNY
+      2. satire(body): Funny English explanation of the issue (100-250 words)
+      3. Hashtags: 5-7 related English hashtags
+
+    Tone and Style:
+      - Humorous but dignified
+      - English expressions that global audiences can understand
+      - Use emojis appropriately
+      - Mix irony and satire through exaggeration, metaphors, wordplay, etc.
+      - Explain Korean cultural context well in English
+      - Make unfamiliar Korean issues understandable
+      ⚠️ Important: Write all content in English.
+
+
+    Writing Guide (Few Shot):
+      Below is an example of successful satirical writing on the theme of 'actor's private life cannot be confirmed.' 
+      Learn from this example's creative approach and apply it to your results.
+
+      example:
+        Topic: Actor Jung Woo-sung's official statement that his 'private life cannot be confirmed'
+
+        Excellent Features writing example:
+        ✨ Features:
+          - Non-Denial-Denial Protocol: Transactions are never officially confirmed, they just appear on the blockchain. We respect their privacy.
+          - Plot Twist Burn Mechanism: A small percentage of the total supply is automatically burned every time a shocking new personal detail about a major public figure is "unable to be confirmed."
+          - Stealth Wedding Rewards: Holders are airdropped bonus tokens when a long-term bachelor/bachelorette finally—and quietly—gets married without a press release.
+
+      Key Learning Points: Do not copy the above example directly.
+      Instead, your mission is to maximize humor by cleverly packaging the core satirical concept with **plausible blockchain-related technical terms like 'Protocol', 'Mechanism', 'Rewards', 'Tokenomics', 'Governance'**. Creatively choose terms that best fit your topic.
+      For example, when satirizing politicians, Governance Model or Voting System might be more suitable, while food-related issues could be funnier with Supply Chain Tokenomics.
+
+  expected_output: >
+    Your response MUST be valid JSON, like this:
+      {
+        "name": "COIN_NAME",
+        "symbol": "SYMBOL",
+        "catchphrase":"English Catchphrase"
+        "satire": "satire in English with humor with korea issue",
+        "feature" : [Feature1 , Feature2, Feature3]
+        "hashtags": [Hashtag1, Hashtag2, Hashtag3],
       }
     Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
 
-  agent: json_converter
-# generate_image_prompt:
-#   description: >
-#     Given the trend "{keyword}" and reason "{why_trending}", write a vivid and specific image generation prompt suitable for DALL·E, Midjourney, or other visual AI models.
+  agent: satirist
 
-#     The prompt must follow these core principles:
+organize_datas:
+  description: >
+    Extract appropriate information from all data generated in previous steps (article summaries, satirical content, etc.) that matches the JSON structure requirements below, and convert it into JSON format usable by website bots.
+          
+    Guidelines:
+    1. Keep all text in English
+    2. Ensure accurate JSON formatting
+    3. Maintain special characters and emojis but ensure they don't break JSON structure
+    4. Accurately classify and place content in each section
+    5. For the "description" field, use the 3-4 sentence summary from the write_description result as is
 
-#     1. **ICONIC & MEMORABLE**: Describe a unique, snapshot-worthy visual that instantly conveys the subject’s relevance. Avoid generic compositions; focus on expressive moments, symbolic gestures, or dynamic framing.
+    Save the JSON to `output/metadata.json` (overwrite if exists).
 
-#     2. **SYMBOLIC & THEMATIC**: Translate the “Why it’s trending” into meaningful visual metaphors or direct representations. Every element should reinforce the core theme or emotional resonance. Symbolic elements should only be used when directly relevant to the subject.
-
-#     3. **STYLISTIC PRECISION**: Clearly state the desired artistic style (e.g., “photo-realistic”, “hyper-realistic cinematic render”, “digital pop-art”). Include lighting details (e.g., “golden hour glow”, “dramatic spotlight”), color palette (e.g., “team colors”, “ethereal pastels”), and overall atmosphere (e.g., “triumphant”, “reflective”, “urgent”).
-#        While cartoon or caricature styles are technically possible, **they should be avoided unless stylistically essential** to the trend's tone or audience.
-
-#     4. **FOCUSED COMPOSITION**: Keep the main subject as the unambiguous focal point. Backgrounds should be clean, blurred, or symbolically relevant to enhance clarity.
-
-#     5. **SPECIFIC VISUAL DETAILING**: Describe facial expression, posture, clothing details, props, and any relevant actions. Avoid vague descriptors.
-
-#     6. **TECHNICAL CONTROL**:
-#        - Append this negative prompt to filter undesirable outputs:
-#          `Negative prompt: blurry, text, low quality, deformed, bad anatomy, generic, watermark, oversaturated, unrealistic`
-
-#     7. **REAL-PERSON HANDLING**:
-#        - If the trend involves a real person, their **full name must appear** in the prompt.
-#        - Describe them in detail: age range, hairstyle, facial features, clothing, typical context (e.g., stadium, press conference), and any signature accessories or gestures.
-#        - **Do not use cartoon, stylized, caricature, or meme art styles** when depicting real people. Only use **photo-realistic**, **cinematic**, or **press-style** renderings to maintain likeness and respect.
-
-#     Additional guideline:
-#     Use grounded and literal imagery. Avoid metaphorical or symbolic language unless it is directly relevant to the trend itself. Make the scene visually intentional by specifying the setting, background elements, mood, lighting, and overall atmosphere to create a vivid and unambiguous mental image.
-
-#     Return the generated prompt directly in context for the next task without saving it to a file.
-#   expected_output: >
-#     "<Single English paragraph image prompt>"
-
-#   agent: visual_prompt_generator
-
-# generate_image_from_file:
-#   description: >
-#     Use the image prompt from context to generate an image with DALL·E via the DalleTool.
-#     Once the image is generated and the URL is available, use it to download and save the image
-#     to 'output/meme_deployer/images/token_image.png'.
-#   expected_output: >
-#     Final saved image confirmation message, e.g. "Image saved to output/meme_deployer/images/token_image.png"
-#   agent: image_generator
-
-# assemble_metadata:
-#   description: >
-#     Use the meme token metadata from context (fields: name, symbol, description)
-#     and combine it with the fixed image path 'output/meme_deployer/images/token_image.png'.
-
-#     Create a Python dictionary named `final_token_metadata` with the structure:
-
-#     final_token_metadata = {
-#       "name": "...",
-#       "symbol": "...",
-#       "description": "...",
-#       "image_path": "output/meme_deployer/images/token_image.png"
-#     }
-
-#     Save this dictionary into a Python file located at 'output/meme_deployer/final_token_metadata.py'.
-#   expected_output: >
-#     output/meme_deployer/final_token_metadata.py
-#   agent: metadata_assembler
+  expected_output: >
+    Your response MUST be valid JSON, like this:
+     {
+        memeTokenMetaData : {
+            "name": "Full memecoin name from input context (write_satire)",
+            "symbol": "Memecoin ticker from input context (write_satire)",
+            "catchphrase":"Catchphrase from input context (write_satire)"
+            "satire": "Satire from input context (write_satire)", 
+            "feature" : "Feature from input context (write_satire)"
+            "hashtags": [hashtags from input context (write_satire)...],
+            "description": "description from input context (write_description)",
+            "korean_issue_summary": {
+                korean_issue_summary from input context (translate_summarize_articles)...
+            },
+            "sources": [sources from input context (translate_summarize_articles)...],
+          }
+      }
+    Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.
+  agent: data_organizer

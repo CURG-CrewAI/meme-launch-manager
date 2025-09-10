@@ -1,7 +1,7 @@
 from crewai import Agent, Crew, Process, Task, LLM
 from crewai.project import CrewBase, agent, crew, task
 from crewai.agents.agent_builder.base_agent import BaseAgent
-from crewai_tools import FileWriterTool, DallETool
+from crewai_tools import FileWriterTool
 from typing import Dict, List, Union
 
 from pydantic import BaseModel, Field
@@ -16,12 +16,12 @@ class Article(BaseModel):
     source: str
 
 
-class NewsArticles(BaseModel):
+class TrendArticles(BaseModel):
     keyword: str
     articles: List[Article]
 
 
-class ArticleContent(BaseModel):
+class Content(BaseModel):
     title: str
     content: str
     key_points: List[str]
@@ -29,18 +29,58 @@ class ArticleContent(BaseModel):
 
 
 class ExtractedContent(BaseModel):
-    extracted_content: List[ArticleContent]
+    extracted_content: List[Content]
+
+
+class Source(BaseModel):
+    outlet: str
+    title: str
+    url: str
+
+
+class IssueSummary(BaseModel):
+    title: str
+    key_visual_keywords: List[str]
+    background: str
+    what_happened: str
+    key_points: List[str]
+    why_it_matters: str
+
+
+class Summary(BaseModel):
+    korean_issue_summary: IssueSummary
+    sources: List[Source]
+
+
+class Description(BaseModel):
+    description: str
+
+
+class Satire(BaseModel):
+    name: str
+    symbol: List[str]
+    catchphrase: str
+    satire: str
+    feature: List[str]
+    hashtags: str
 
 
 class MemeTokenMetaData(BaseModel):
-    memeTokenMetaData: Dict[str, Union[str, List[str]]]
+    name: str
+    symbol: str
+    catchphrase: str
+    satire: str
+    feature: List[str]
+    hashtags: List[str]
+    description: str
+    korean_issue_summary: IssueSummary
+    sources: List[Source]
 
 
 metadata_writer_tool = FileWriterTool(
     file_name="metadata.json", directory="output", overwrite=True
 )
 
-# dalle_tool = DallETool(model="dall-e-3", size="1024x1024", quality="standard", n=1)
 serper_tool = SerperDevTool()
 scrape_tool = ScrapeWebsiteTool()
 
@@ -56,12 +96,19 @@ class MemeDataGeneratorCrew:
     agents_config = "config/agents.yaml"
     tasks_config = "config/tasks.yaml"
 
+    _agent_common = dict(
+        allow_delegation=False,
+        max_iter=2,
+        max_rpm=10,
+    )
+
     @agent
     def news_url_collector(self) -> Agent:
         return Agent(
             config=self.agents_config["news_url_collector"],
             verbose=True,
             tools=[serper_tool],
+            **self._agent_common,
         )
 
     @agent
@@ -70,6 +117,22 @@ class MemeDataGeneratorCrew:
             config=self.agents_config["article_extractor"],
             verbose=True,
             tools=[scrape_tool],
+            **self._agent_common,
+        )
+
+    @agent
+    def summary_translation_agent(self) -> Agent:
+        return Agent(
+            config=self.agents_config["summary_translation_agent"],
+            verbose=True,
+            **self._agent_common,
+        )
+
+    @agent
+    def description_writer(self) -> Agent:
+        return Agent(
+            config=self.agents_config["description_writer"],
+            verbose=True,
         )
 
     @agent
@@ -80,34 +143,18 @@ class MemeDataGeneratorCrew:
         )
 
     @agent
-    def json_converter(self) -> Agent:
+    def data_organizer(self) -> Agent:
         return Agent(
-            config=self.agents_config["json_converter"],
+            config=self.agents_config["data_organizer"],
             verbose=True,
             tools=[metadata_writer_tool],
         )
-
-    # @agent
-    # def visual_prompt_generator(self) -> Agent:
-    #     return Agent(config=self.agents_config["visual_prompt_generator"], verbose=True)
-
-    # @agent
-    # def image_generator(self) -> Agent:
-    #     return Agent(
-    #         config=self.agents_config["image_generator"],
-    #         tools=[dalle_tool, DownloadImageTool()],
-    #         verbose=True,
-    #     )
-
-    # @agent
-    # def metadata_assembler(self) -> Agent:
-    #     return Agent(config=self.agents_config["metadata_assembler"], verbose=True)
 
     @task
     def collect_news_url(self) -> Task:
         return Task(
             config=self.tasks_config["collect_news_url"],
-            output_json=NewsArticles,
+            output_json=TrendArticles,
         )
 
     @task
@@ -119,31 +166,42 @@ class MemeDataGeneratorCrew:
         )
 
     @task
-    def write_satire(self) -> Task:
+    def translate_summarize_articles(self) -> Task:
         return Task(
-            config=self.tasks_config["write_satire"],
+            config=self.tasks_config["translate_summarize_articles"],
             context=[self.extract_main_article()],
+            output_json=Summary,
         )
 
     @task
-    def convert_json(self) -> Task:
+    def write_description(self) -> Task:
         return Task(
-            config=self.tasks_config["convert_json"],
-            context=[self.write_satire()],
-            output_json=MemeTokenMetaData,
+            config=self.tasks_config["write_description"],
+            context=[self.translate_summarize_articles()],
+            output_json=Description,
+            # async_execution=True,
         )
 
-    # @task
-    # def generate_image_prompt(self) -> Task:
-    #     return Task(config=self.tasks_config["generate_image_prompt"])
+    @task
+    def write_satire(self) -> Task:
+        return Task(
+            config=self.tasks_config["write_satire"],
+            context=[self.translate_summarize_articles()],
+            output_json=Satire,
+            # async_execution=True,
+        )
 
-    # @task
-    # def generate_image_from_file(self) -> Task:
-    #     return Task(config=self.tasks_config["generate_image_from_file"])
-
-    # @task
-    # def assemble_metadata(self) -> Task:
-    #     return Task(config=self.tasks_config["assemble_metadata"])
+    @task
+    def organize_datas(self) -> Task:
+        return Task(
+            config=self.tasks_config["organize_datas"],
+            context=[
+                self.write_satire(),
+                self.write_description(),
+                self.translate_summarize_articles(),
+            ],
+            output_json=MemeTokenMetaData,
+        )
 
     @crew
     def crew(self) -> Crew:

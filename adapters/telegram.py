@@ -39,7 +39,7 @@ class TelegramAdapter:
         for idx, item in enumerate(trends, start=1):
             keyword = item.get("keyword") or "N/A"
             reason = item.get("why_trending") or "No explanation available."
-            lines.append(f"{idx}. {keyword} — {reason}")
+            lines.append(f"{idx}. {keyword} — {reason}\n")
         self.send("\n".join(lines))
 
     def send_photo(self, data: bytes, filename: str, caption: str = ""):
