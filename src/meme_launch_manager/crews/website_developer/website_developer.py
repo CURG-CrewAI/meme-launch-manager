@@ -7,7 +7,7 @@ from crewai.project import CrewBase, agent, crew, task, after_kickoff
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import FileWriterTool, FileReadTool
 from pydantic import BaseModel
-from utils.website_helper import deploy_site
+from utils.pages.deploy import deploy_site
 
 catalog_cfg_reader_tool = FileReadTool(file_path="templates/catalog.json")
 

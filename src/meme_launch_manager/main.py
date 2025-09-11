@@ -1,7 +1,6 @@
 from pydantic import BaseModel
 from crewai.flow import Flow, listen, or_, router, start
-from utils.image_helper import edit_images_bytes
-from utils.metadata_helper import update_metadata
+from utils.image.edit import edit_images_bytes
 
 from meme_launch_manager.crews.trending_scraper.trending_scraper import (
     TrendingScraperCrew,
