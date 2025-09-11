@@ -15,11 +15,14 @@ from meme_launch_manager.crews.website_developer.website_developer import (
 
 import json
 
+from utils.r2.uploads import upload_image, upload_json
+
 
 class MemeLaunchFlowState(BaseModel):
     top_trends: dict | None = None
     selected_trend: dict | None = None
     token_metadata: dict | None = None
+    image_bytes: bytes | None = None
     image_url: str | None = None
     website_url: str | None = None
 
@@ -45,7 +48,7 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
     def run_meme_data_generator(self):
         selected_trend = self.state.selected_trend
         token_metadata = MemeDataGeneratorCrew().crew().kickoff(inputs=selected_trend)
-        self.io.send(token_metadata['MemeTokenMetaData'])
+        self.io.send(token_metadata["MemeTokenMetaData"])
         self.state.token_metadata = token_metadata
 
     @router(run_meme_data_generator)
@@ -70,29 +73,33 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         prompt = (
             "사진의 인물이 화내고 있고, 다른 사진의 배경에 자연스럽게 합성해주세요."
         )
+
         try:
-            out_bytes = edit_images_bytes(prompt, image1_bytes, image2_bytes)
+            image_bytes = edit_images_bytes(prompt, image1_bytes, image2_bytes)
         except Exception as e:
             self.io.send(f"Image editing failed: {e!r}")
             raise
 
         self.io.send_photo(
-            out_bytes, filename="edited_image.jpg", caption="Editing Complete!"
+            image_bytes, filename="edited_image.jpg", caption="Editing Complete!"
         )
-        self.state.image_url = "mock data"
+
+        self.state.image_bytes = image_bytes
 
     @listen("Image Not Edited")
     def get_image(self):
         image_bytes = self.io.get_image(
             "Please send the photo for token image.\n Waiting for the photo…"
         )
-        self.state.image_url = "mock data"
+        self.state.image_bytes = image_bytes
 
     @listen(or_(run_image_generator, get_image))
     def update_image_url_metadata(self):
-        url = self.state.image_url
+        image_bytes = self.state.image_bytes
+        token_metadata = self.state.token_metadata
+        url = upload_image(image_bytes, self.state.id)
         if url:
-            update_metadata("output/metadata.json", "imgUrl", url)
+            token_metadata["MemeTokenMetaData"]["imgUrl"] = url
 
     @router(update_image_url_metadata)
     def ask_make_website(self):
@@ -117,25 +124,27 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
     @listen(run_website_developer)
     def update_website_url_metadata(self):
         url = self.state.website_url
-        if url:
-            update_metadata("output/metadata.json", "WebUrl", url)
+        token_metadata = self.state.token_metadata
+        token_metadata["MemeTokenMetaData"]["webUrl"] = url
 
     @listen(or_(update_website_url_metadata, "Not Generated"))
     def update_telegram_url_metadata(self):
         url = self.io.get_text("Telegram URL")
-        if url:
-            update_metadata("output/metadata.json", "telegramUrl", url)
+        token_metadata = self.state.token_metadata
+        token_metadata["MemeTokenMetaData"]["telegramUrl"] = url
 
     @listen(update_telegram_url_metadata)
     def update_x_url_metadata(self):
         url = self.io.get_text("X(twitter) URL")
-        if url:
-            update_metadata("output/metadata.json", "xUrl", url)
+        token_metadata = self.state.token_metadata
+        token_metadata["MemeTokenMetaData"]["xUrl"] = url
 
     @listen(update_x_url_metadata)
     def finalize(self):
+        token_metadata = self.state.token_metadata
         self.io.send("\n===🎉🎉🎉 Your MemeToken Metadata 🎉🎉🎉===\n")
-        self.io.send_json("output/metadata.json")
+        url = upload_json(token_metadata["MemeTokenMetaData"], self.state.id)
+        self.io.send(url)
 
     def kickoff(self):
         try:
