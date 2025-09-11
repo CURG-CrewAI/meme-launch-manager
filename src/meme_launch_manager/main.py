@@ -44,10 +44,9 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
     @listen(select_trend)
     def run_meme_data_generator(self):
         selected_trend = self.state.selected_trend
-        self.state.token_metadata = (
-            MemeDataGeneratorCrew().crew().kickoff(inputs=selected_trend)
-        )
-        self.io.send(f"{self.state.token_metadata}")
+        token_metadata = MemeDataGeneratorCrew().crew().kickoff(inputs=selected_trend)
+        self.io.send(token_metadata['MemeTokenMetaData'])
+        self.state.token_metadata = token_metadata
 
     @router(run_meme_data_generator)
     def ask_edit_image(self):
@@ -110,7 +109,9 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
         token_metadata = self.state.token_metadata
         print(token_metadata)
         self.state.website_url = (
-            WebsiteDeveloper().crew().kickoff(inputs=token_metadata)
+            WebsiteDeveloper()
+            .crew()
+            .kickoff(inputs={"token_metadata": token_metadata["MemeTokenMetaData"]})
         )
 
     @listen(run_website_developer)
@@ -121,13 +122,13 @@ class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
 
     @listen(or_(update_website_url_metadata, "Not Generated"))
     def update_telegram_url_metadata(self):
-        url = self.io.get_text("Telegram URL:")
+        url = self.io.get_text("Telegram URL")
         if url:
             update_metadata("output/metadata.json", "telegramUrl", url)
 
     @listen(update_telegram_url_metadata)
     def update_x_url_metadata(self):
-        url = self.io.get_text("X(twitter) URL:")
+        url = self.io.get_text("X(twitter) URL")
         if url:
             update_metadata("output/metadata.json", "xUrl", url)
 

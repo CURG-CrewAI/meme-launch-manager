@@ -65,7 +65,7 @@ class Satire(BaseModel):
     hashtags: str
 
 
-class MemeTokenMetaData(BaseModel):
+class Datas(BaseModel):
     name: str
     symbol: str
     catchphrase: str
@@ -75,6 +75,10 @@ class MemeTokenMetaData(BaseModel):
     description: str
     korean_issue_summary: IssueSummary
     sources: List[Source]
+
+
+class MemeTokenMetaData(BaseModel):
+    MemeTokenMetaData: Datas
 
 
 metadata_writer_tool = FileWriterTool(
