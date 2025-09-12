@@ -98,3 +98,6 @@ desktop.ini
 
 # Output folders
 output/
+
+# Python virtual environment
+.venv/

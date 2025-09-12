@@ -1,10 +1,11 @@
-#!/usr/bin/env python
-from __future__ import annotations
-import json
-import os
-
-from pydantic import BaseModel, Field
-from crewai.flow import Flow, listen, start
+from crewai import Agent, Crew, Task
+from pydantic import BaseModel
+from crewai.flow import Flow, listen, or_, router, start
+from utils.image.download import download_image
+from utils.image.nano_banana import edit_images_bytes
+from utils.pages.deploy import deploy_site
+from utils.pages.domain import add_domain
+from utils.r2.uploads import upload_image, upload_json
 
 from meme_launch_manager.crews.trending_scraper.trending_scraper import (
     TrendingScraperCrew,
@@ -16,121 +17,152 @@ from meme_launch_manager.crews.website_developer.website_developer import (
     WebsiteDeveloper,
 )
 
-from utils.metadata_manager import print_metadata
-from utils.trends_io import load_trends_from_file, parse_raw_trends
-from utils.cli import format_trends, prompt_choice, normalize_numeric, prompt_make_site
-from utils.selection import validate_choice, pick_trend
 
-
-# 플로우 스테이트 (트렌드 스크래핑해온 5개 저장 및 선택한 트렌드 저장 and 웹사이트 생성 찬반, 토큰메타데이터 저장)
 class MemeLaunchFlowState(BaseModel):
-    top_trends: list = Field(default_factory=list)
+    top_trends: dict | None = None
     selected_trend: dict | None = None
-    make_website: bool = False
-    token_meta: dict | None = None
+    token_data: dict | None = None
+    token_metadata: dict | None = None
+    image_bytes: bytes | None = None
+    image_url: str | None = None
+    website_url: str | None = None
 
 
 class MemeLaunchFlow(Flow[MemeLaunchFlowState]):
+    def __init__(self, io, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.io = io  # TelegramAdapter
 
-    # 트렌드를 스크래핑하고 플로우 스테이트에 담아서 다음 함수에게 전달
     @start()
-    def run_scraping_crew(self):
-        print("👀 Looking for trends in South Korea...")
-        result = TrendingScraperCrew().crew().kickoff()
-        trends = load_trends_from_file("output/trending_scraper/trends.json")
-        if not trends:
-            trends = parse_raw_trends(result.raw)
-        self.state.top_trends = trends or []
+    def run_trending_scraper(self):
+        self.io.send("👀 Looking for trends in South Korea...")
+        top_trends = TrendingScraperCrew().crew().kickoff()
+        self.io.send_trends(top_trends["trendsWithWhy"])
+        self.state.top_trends = top_trends
 
-    # 플로우 스테이트에 담겨있는 트렌드를 가지고 유저에게 입력 받음 -> CLI에 출력 및 다시 플로우 스테이트에 저장
-    @listen(run_scraping_crew)
-    def display_result(self):
-        trends = self.state.top_trends
-        if not trends:
-            print("⚠️ There are no trends to display.")
-            return
-        print(format_trends(trends))
+    @listen(run_trending_scraper)
+    def select_trend(self):
+        top_trends = self.state.top_trends["trendsWithWhy"]
+        self.state.selected_trend = self.io.get_trend_choice(top_trends, default=1)
 
-        # 현재 1~5가 아닌숫자나 문자등이 들어오면 무조건 1반환해서 생성하게 되어있음 나중에 루프 붙일때 수정 예정
-        raw = prompt_choice("Choose the trend keyword number you want.", default=1)
-        normalized = normalize_numeric(raw)
-
-        if raw.strip() == "":
-            print("⚠️ No input provided. Default (1) selected.")
-        elif normalized is None:
-            print("❌ Not a valid number. Default (1) selected.")
-
-        choice = validate_choice(normalized, max_len=len(trends), default=1)
-        if (normalized is not None) and (choice != normalized):
-            print("❌ Invalid number. Default (1) selected.")
-
-        selected = pick_trend(trends, choice)
-        self.state.selected_trend = selected
-
-        if selected:
-            print(f"\n✅ Selected keyword: {selected.get('keyword','N/A')}")
-
-    # 플로우스테이트에서 선택된 트렌드 확인후 밈토큰 메타데이터및 이미지 생성
-    @listen(display_result)
+    @listen(select_trend)
     def run_meme_data_generator(self):
-        trend = self.state.selected_trend
-        if not trend:
-            print("⚠️ No trend selected")
-            return
-
-        inputs = {
-            "keyword": trend["keyword"],
-            "why_trending": trend["why_trending"],
-        }
-        result = MemeDataGeneratorCrew().crew().kickoff(inputs=inputs)
-
-        meta = result.raw
-        if isinstance(meta, str):
-            try:
-                meta = json.loads(meta)
-            except Exception:
-                meta = {"raw": result.raw}
-
-        self.state.token_meta = meta
-        print("\n=== Basic Meme Token Metadata ===\n")
-        print_metadata("output/metadata.json")
-
-    # 웹사이트 생성 물어보기 -> 만드는지 안만드는지 bool로 저장
-    @listen(run_meme_data_generator)
-    def ask_make_website(self):
-        self.state.make_website = prompt_make_site(
-            "Do you want to create and deploy a website?", default="n"
+        selected_trend = self.state.selected_trend
+        total_token_datas = (
+            MemeDataGeneratorCrew().crew().kickoff(inputs=selected_trend)
         )
-        print(f"🌐 Website generation: {'ON' if self.state.make_website else 'OFF'}")
+        self.state.token_data = total_token_datas["memeTokenData"]
+        self.state.token_metadata = total_token_datas["metadata"]
+        self.io.send("\n===Basic Metadata===\n")
+        self.io.send(
+            f"Name: {self.state.token_metadata['name']}\nSymbol: {self.state.token_metadata['symbol']}\nDescription: {self.state.token_metadata['description']}"
+        )
 
-    # 웹사이트 생성 <- 토큰 메타데이터 받아서 사이트 생성
-    @listen(ask_make_website)
-    def maybe_build_website(self):
-        if not self.state.make_website:
-            print("⚠️ Website generation skipped.")
-            return
-        if not self.state.token_meta:
-            print("⚠️ No token metadata in memory.")
-            return
+    @router(run_meme_data_generator)
+    def ask_edit_image(self):
+        image_flag = self.io.get_confirmation(
+            "❔ Edit images? (default=N) (Y/N)", default=False
+        )
+        if image_flag:
+            return "Image Edited"
+        else:
+            return "Image Not Edited"
 
-        os.makedirs("output/moods", exist_ok=True)
-        os.makedirs("output/site/images", exist_ok=True)
+    @listen("Image Edited")
+    def run_image_generator(self):
+        token_metadata = self.state.token_metadata
+        self.io.send(
+            "ℹ️ You can upload 2 images for editing\n\n  🙏 Please upload the images one by one 🙏"
+        )
+        image1_bytes = self.io.get_image(
+            "❔ Please send the photo for editing.\n Waiting for the First photo…"
+        )
+        image2_bytes = self.io.get_image(
+            "❔ Please send the photo for editing.\n Waiting for the Second photo…"
+        )
+        prompt = f"Read the following description and seamlessly composite the two photos. \nDescription:{token_metadata['description']}'"
 
-        print("🌐 Building & deploying meme token website...")
-        WebsiteDeveloper().crew().kickoff(inputs={"token_meta": self.state.token_meta})
-        print("\n=== Advanced Meme Token Metadata ===\n")
-        print_metadata("output/metadata.json")
+        try:
+            image_bytes = edit_images_bytes(prompt, image1_bytes, image2_bytes)
+        except Exception as e:
+            self.io.send(f"Image editing failed: {e!r}")
+            raise
 
+        self.state.image_bytes = image_bytes
 
-def kickoff():
-    flow = MemeLaunchFlow()
-    flow.kickoff()
+    @listen("Image Not Edited")
+    def get_image(self):
+        image_bytes = self.io.get_image(
+            "❔ Please send the photo for token image.\n Waiting for the photo…"
+        )
+        self.state.image_bytes = image_bytes
 
+    @listen(or_(run_image_generator, get_image))
+    def update_image_url_metadata(self):
+        image_bytes = self.state.image_bytes
+        token_metadata = self.state.token_metadata
+        url = upload_image(image_bytes, self.state.id)
+        if url:
+            self.io.send("\n===Edited Image===\n")
+            self.io.send(url)
+            token_metadata["imgUrl"] = url
+        else:
+            self.io.send("nano-banana error")
+            token_metadata["imgUrl"] = "/images/test-token.jpg"
 
-def plot():
-    flow = MemeLaunchFlow()
-    flow.plot()
+    @router(update_image_url_metadata)
+    def ask_make_website(self):
+        website_flag = self.io.get_confirmation(
+            "❔ Do you want to create and deploy a website? (default=N) (Y/N)"
+        )
+        if website_flag:
+            return "Generated"
+        else:
+            return "Not Generated"
 
+    @listen("Generated")
+    def run_website_developer(self):
+        token_data = self.state.token_data
+        image_bytes = self.state.image_bytes
+        download_image(image_bytes, "output/site/images", "token_image.jpg")
+        WebsiteDeveloper().crew().kickoff(inputs={"token_metadata": token_data})
+        self.state.website_url = deploy_site("output/site", "main", self.state.id)
 
-if __name__ == "__main__":
-    kickoff()
+    @listen(or_(run_website_developer, "Not Generated"))
+    def update_website_url_metadata(self):
+        url = self.state.website_url
+        token_metadata = self.state.token_metadata
+        if url:
+            self.io.send("\n===Memetoken Website===\n")
+            self.io.send(url)
+            token_metadata["webUrl"] = url
+        else:
+            token_metadata["webUrl"] = "https://example.com"
+
+    @listen(update_website_url_metadata)
+    def update_telegram_url_metadata(self):
+        url = self.io.get_text("❔ Telegram URL", "https://t.me/example")
+        token_metadata = self.state.token_metadata
+        token_metadata["telegramUrl"] = url
+
+    @listen(update_telegram_url_metadata)
+    def update_x_url_metadata(self):
+        url = self.io.get_text("❔ X(twitter) URL", "https://twitter.com/example")
+        token_metadata = self.state.token_metadata
+        token_metadata["xUrl"] = url
+
+    @listen(update_x_url_metadata)
+    def finalize(self):
+        token_metadata = self.state.token_metadata
+        self.io.send("\n===🎉🎉🎉 Your MemeToken Metadata 🎉🎉🎉===\n")
+        url = upload_json(token_metadata, self.state.id)
+        self.io.send(url)
+
+    def kickoff(self):
+        try:
+            super().kickoff()
+        except TimeoutError:
+            self.io.send("TimeOut")
+        except Exception as e:
+            self.io.send(f"Error")
+            raise

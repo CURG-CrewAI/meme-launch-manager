@@ -1,19 +1,19 @@
 namunews_trending_scraper:
   role: >
-    Expert Web Crawler for Real-time Trending Keywords on Namunews
+    Expert Web Scraper for Real-time Trending Keywords on Namunews
   goal: >
     To identify and extract current trending search terms from the Namunews website
     and return them as a JSON array (no file save).
   backstory: >
     Well-versed in the layout and structure of the Namunews site, with the ability to precisely locate and extract relevant trending keywords.
 
-# signal_trending_scraper:
-#   role: >
-#     Signal Site Real-time Search Keyword Crawler Expert
-#   goal: >
-#     To extract popular keywords from the Signal site and return them as a JSON array (no file save).
-#   backstory: >
-#     Familiar with the Signal site structure and capable of accurately extracting only the necessary information.
+signal_trending_scraper:
+  role: >
+    Expert Web Scraper for Real-time Trending Keywords on Signal
+  goal: >
+    To extract trending keywords from the Signal site and return them as a JSON array (no file save).
+  backstory: >
+    Familiar with the Signal site structure and capable of accurately extracting only the necessary information.
 
 x_trending_crawler:
   role: >

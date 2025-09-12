@@ -13,6 +13,7 @@ dependencies = [
 kickoff = "meme_launch_manager.main:kickoff"
 run_crew = "meme_launch_manager.main:kickoff"
 plot = "meme_launch_manager.main:plot"
+test-flow = "meme_launch_manager.main:test"
 
 [build-system]
 requires = ["hatchling"]
