@@ -43,31 +43,31 @@ def _project_exists(name: str) -> bool:
         return False
 
 
-def _create_project(project_name: str, production_branch: str = "main") -> None:
-    print(f"🆕 Creating Pages project '{project_name}'...")
+def _create_project(domain: str, production_branch: str = "main") -> None:
+    print(f"🆕 Creating Pages project '{domain}'...")
     try:
         _run(
             "wrangler",
             "pages",
             "project",
             "create",
-            project_name,
+            domain,
             f"--production-branch={production_branch}",
         )
     except DeployError as e:
         if "already exists" in str(e) or "8000002" in str(e):
-            print(f"ℹ️ Project '{project_name}' already exists. Skipping create.")
+            print(f"ℹ️ Project '{domain}' already exists. Skipping create.")
         else:
             raise
 
 
-def _deploy_pages(project_name: str, site_dir: str, branch: str = "main") -> str:
+def _deploy_pages(domain: str, site_dir: str, branch: str = "main") -> str:
     out = _run(
         "wrangler",
         "pages",
         "deploy",
         str(site_dir),
-        f"--project-name={project_name}",
+        f"--project-name={domain}",
         f"--branch={branch}",
     )
     urls = set(re.compile(r"https?://[a-zA-Z0-9._/-]+").findall(out))
@@ -81,23 +81,20 @@ def _deploy_pages(project_name: str, site_dir: str, branch: str = "main") -> str
     return url
 
 
-def deploy_site(
-    site_dir: str,
-    branch: str = "main",
-) -> str:
+def deploy_site(site_dir: str, branch: str = "main", project_name: str = "site") -> str:
     print(
         "🚀 Starting deployment via Cloudflare Pages (Wrangler Direct Upload, single project)...\n"
     )
     _check_wrangler_installed()
     _check_site_dir_exists(site_dir)
 
-    project_name = f"{os.path.basename(os.path.abspath(site_dir))}-site"
+    domain = f"{project_name}-site"
 
-    print(f"📦 Project name: {project_name}\n📁 Deploy directory: {site_dir}")
+    print(f"📦 Domain: {domain}\n📁 Deploy directory: {site_dir}")
 
-    if not _project_exists(project_name):
-        _create_project(project_name, production_branch=branch)
+    if not _project_exists(domain):
+        _create_project(domain, production_branch=branch)
 
-    url = _deploy_pages(project_name, site_dir, branch=branch)
+    url = _deploy_pages(domain, site_dir, branch=branch)
 
     return url

@@ -5,12 +5,13 @@ from src.utils.r2.client import client
 
 BUCKET = os.environ["R2_BUCKET"]
 R2_ENDPOINT = os.environ["R2_ENDPOINT"]
+CUSTOM_DOMAIN = os.environ["CUSTOM_DOMAIN"]
 
 r2 = client()
 
 
 def get_r2_url(key: str) -> str:
-    return f"{R2_ENDPOINT}/{BUCKET}/{key}"
+    return f"{CUSTOM_DOMAIN}/{key}"
 
 
 def upload_image(data: bytes, file_name: str) -> str:

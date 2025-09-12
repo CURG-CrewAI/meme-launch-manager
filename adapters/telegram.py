@@ -13,7 +13,8 @@ class TelegramAdapter:
         self.q: "queue.Queue[str]" = queue.Queue()
 
     def _submit(self, coro):
-        asyncio.run_coroutine_threadsafe(coro, self.loop)
+        future = asyncio.run_coroutine_threadsafe(coro, self.loop)
+        return future.result()
 
     def _load_file_bytes(self, file_id: str) -> bytes:
         async def _do():
@@ -72,7 +73,7 @@ class TelegramAdapter:
     def get_trend_choice(self, trends: list[dict], default: int = 1) -> Optional[dict]:
         selected_number = default
         answer = self._get(
-            f"\nChoose the trend keyword number you want (default={default})"
+            f"\n❔ Choose the trend keyword number you want (default={default})"
         )
         if not answer:
             self.send(f"Invalid input (empty). Default ({default}) selected.")
@@ -99,9 +100,13 @@ class TelegramAdapter:
             return False
         return default
 
-    def get_text(self, prompt: str = "Enter answer") -> Optional[str]:
+    def get_text(
+        self, prompt: str = "Enter answer", default: str = ""
+    ) -> Optional[str]:
         answer = (self._get(prompt) or "").strip()
-        return answer or None
+        if not answer:
+            return default or "<EMPTY>"
+        return answer
 
     def get_image(self, prompt: str = "Enter answer") -> Optional[bytes]:
         while True:

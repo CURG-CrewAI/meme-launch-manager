@@ -27,7 +27,6 @@ class TrendsWithWhy(BaseModel):
     trendsWithWhy: List[Dict[str, str]]
 
 
-# === Scraping tools ===
 namunews_scraping_tool = SeleniumScrapingTool(
     website_url="https://namu.news/", wait_time=15, result_as_answer=True
 )
@@ -48,14 +47,6 @@ google_scraping_tool = SeleniumScrapingTool(
     css_element=".enOdEe-wZVHld-zg7Cn",
     wait_time=15,
     result_as_answer=True,
-)
-
-# === Writer tools ===
-scrapped_site_writer_tool = FileWriterTool(
-    file_name="scrapped_site.json", directory="output", overwrite=True
-)
-trends_writer_tool = FileWriterTool(
-    file_name="trends.json", directory="output", overwrite=True
 )
 
 serper_tool = SerperDevTool()
@@ -108,10 +99,7 @@ class TrendingScraperCrew:
 
     @agent
     def trending_organizer(self) -> Agent:
-        return Agent(
-            config=self.agents_config["trending_organizer"],
-            tools=[scrapped_site_writer_tool],
-        )
+        return Agent(config=self.agents_config["trending_organizer"])
 
     @agent
     def cross_validation_agent(self) -> Agent:
@@ -121,7 +109,7 @@ class TrendingScraperCrew:
     def trend_explainer(self) -> Agent:
         return Agent(
             config=self.agents_config["trend_explainer"],
-            tools=[trends_writer_tool, serper_tool],
+            tools=[serper_tool],
             allow_delegation=False,
             verbose=False,
             max_iter=12,

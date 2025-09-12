@@ -304,13 +304,14 @@ organize_datas:
     3. Maintain special characters and emojis but ensure they don't break JSON structure
     4. Accurately classify and place content in each section
     5. For the "description" field, use the 3-4 sentence summary from the write_description result as is
+    6. The name, symbol, description and sources in memeTokenData must always be the same as the name, symbol,description  and sources in metadata.
 
     Save the JSON to `output/metadata.json` (overwrite if exists).
 
   expected_output: >
     Your response MUST be valid JSON, like this:
      {
-        memeTokenMetaData : {
+        memeTokenData : {
             "name": "Full memecoin name from input context (write_satire)",
             "symbol": "Memecoin ticker from input context (write_satire)",
             "catchphrase":"Catchphrase from input context (write_satire)"
@@ -322,6 +323,12 @@ organize_datas:
                 korean_issue_summary from input context (translate_summarize_articles)...
             },
             "sources": [sources from input context (translate_summarize_articles)...],
+          },
+        metadata : {
+            "name": "Full memecoin name from input context (write_satire)",
+            "symbol": "Memecoin ticker from input context (write_satire)",
+            "description": "description from input context (write_description)",
+            "sources": [sources from input context (translate_summarize_articles)...]
           }
       }
     Your response MUST be valid JSON, following the format defined above. Do not include any extra commentary or markdown formatting.

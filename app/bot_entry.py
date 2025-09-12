@@ -119,7 +119,7 @@ async def inbox(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
-    app = Application.builder().token(BOT_TOKEN).concurrent_updates(True).build()
+    app = Application.builder().token(BOT_TOKEN).concurrent_updates(False).build()
 
     # commands
     app.add_handler(CommandHandler("start", start_cmd))
@@ -133,7 +133,7 @@ def main():
     # error
     app.add_error_handler(error)
     # polls the bot
-    app.run_polling(drop_pending_updates=True)
+    app.run_polling(drop_pending_updates=False)
 
 
 if __name__ == "__main__":

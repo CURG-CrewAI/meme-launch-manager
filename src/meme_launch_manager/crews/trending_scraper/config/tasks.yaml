@@ -54,7 +54,7 @@ organize_trending:
     Combine them into a single JSON object grouped by source.
     Each key in the JSON object should be the service name (e.g., "namunews", "x", "google", "signal")
     and the value should be an array of keywords in order of ranking.
-    Save this combined object to `output/trending_scraper/scrapped_site.json` and also return it as context for the next task.
+    Return JSON as context for the next task.
   expected_output: >
     Your response MUST be valid JSON, like this:
     {
@@ -92,6 +92,7 @@ cross_validate_trending:
       * **Anchor Token Identification**: Identify an anchor token (e.g., namhansanseong, mantis) that appears as an independent word.
       * **Keyword Mapping**: Map any keyword containing this anchor token to that anchor. The token can be at the **start**, **end**, or in the **middle** of the keyword, separated by a space or punctuation.
       * **Category Preservation Rule**: If a keyword includes a specific **category** (e.g., movie, drama, musical), the final merged result should retain this category information.
+      * **People Word Rule**: If it is a person, please include their occupation before their name.
 
       - Examples:
         - "lck 페이커" (X), "lck geng" (Signal), "lck 결승" (Namunews) → "lck"
@@ -100,6 +101,7 @@ cross_validate_trending:
         - "aespa concert" (Signal), "aespa 카리나" (Namunews) → "aespa"
         - "드라마 사마귀" (Signal), "사마귀" (Namunews) → "드라마 사마귀"
         - "남한산성 영화" (Signal), "영화 남한산성" (Namunews), "남한산성 평점" (Google) → "영화 남한산성"
+        - "홍성호 야구선수" (Signal), "두산 홍성호" (Namunews), "홍성호" (Google) → "야구선수 홍성호"
     - Substring merging (optional): If an alphanumeric anchor of length ≥ 3 appears as
       a contiguous substring in another keyword, and the remaining part is a proper noun
       or modifier, merge under the anchor.
@@ -172,7 +174,6 @@ explain_trends:
     - Avoid vague phrasing ("caused issues", "sparked debate") without specifics.
     - Do not exceed 3 sentences.
 
-    Save the JSON to `output/trending_scraper/trends.json` (overwrite if exists).
     Return exactly the same list of dictionaries as the final output.
 
   expected_output: >

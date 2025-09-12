@@ -34,13 +34,12 @@ write_website_contents:
 
 
     📊 tokenomics requirements:
-    1. Total Supply: A ridiculous number (e.g. 420.69 trillion)
-    2. Distribution:
+    1. Distribution:
     - Team: X% (with a ridiculous reason)
     - Marketing: X% (with a ridiculous marketing plan)
     - Liquidity: X 
     - Community: X% (with ridiculous community benefits)
-    3. Special Features:
+    2. Special Features:
     **(required) Specifically describe ideas taken from the `✨Features` in the satire article**.
         
     🗺️ ROADMAP Requirements:
@@ -52,7 +51,6 @@ write_website_contents:
     Format:
     📊 TOKENOMICS
     ================
-    Total Supply: [Number].
         
     Distribution:
     - Team: X% - [funny description].
@@ -156,7 +154,7 @@ build_meme_token_sites:
       - The background color of the website must be the background color specified in the catalog.
       - Utilize the entire color palette and all component styles from the catalog to their fullest extent.
       - In index.html, include the logo with:
-        <img src="images/token_image.png" alt="site logo" width="200" height="200">
+        <img src="images/token_image.jpg" alt="site logo" width="200" height="200">
       - “⚠️ Very Important:” All images used on our website must not exceed 200x200 pixels.
       - Save the site to 'output/site/index.html' using 'site_writer_tool'
 

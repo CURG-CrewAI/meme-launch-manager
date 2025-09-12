@@ -7,7 +7,7 @@ from crewai.project import CrewBase, agent, crew, task, after_kickoff
 from crewai.agents.agent_builder.base_agent import BaseAgent
 from crewai_tools import FileWriterTool, FileReadTool
 from pydantic import BaseModel
-from utils.pages.deploy import deploy_site
+
 
 catalog_cfg_reader_tool = FileReadTool(file_path="templates/catalog.json")
 
@@ -45,12 +45,6 @@ class WebsiteDeveloper:
         max_iter=2,
         max_rpm=10,
     )
-
-    @after_kickoff
-    def deploy_page(self, output) -> None:
-        site_dir = "output/site"
-        url = deploy_site(site_dir, "main")
-        return url
 
     @agent
     def meme_mood_curator(self) -> Agent:

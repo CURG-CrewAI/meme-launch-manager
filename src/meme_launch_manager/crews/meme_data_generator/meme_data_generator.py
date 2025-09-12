@@ -77,8 +77,16 @@ class Datas(BaseModel):
     sources: List[Source]
 
 
+class Metadata(BaseModel):
+    name: str
+    symbol: str
+    description: str
+    sources: List[Source]
+
+
 class MemeTokenMetaData(BaseModel):
-    MemeTokenMetaData: Datas
+    memeTokenData: Datas
+    metadata: Metadata
 
 
 metadata_writer_tool = FileWriterTool(
