@@ -121,7 +121,7 @@ cross_validate_trending:
 
     Fill-up rule:
     - If fewer than 5 representative keywords appear across multiple services,
-      fill the remaining slots with keywords from the Namunews list (after normalization),
+      fill the remaining slots with keywords from the Google list (after normalization),
       in order of appearance, until there are exactly 5 items.
 
     Output:

@@ -16,6 +16,7 @@ site_writer_tool = FileWriterTool(
 )
 
 gemini_pro = LLM(model="gemini/gemini-2.5-pro")
+# claude_pro = LLM(model="anthropic/claude-3-sonnet-20240229-v1:0")
 
 
 class TokenMood(BaseModel):
